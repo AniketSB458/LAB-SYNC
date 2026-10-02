@@ -2,28 +2,19 @@
   "name": "smart-campus-lab-optimizer",
   "version": "1.0.0",
   "private": true,
-  "description": "Smart Campus Lab & Resource Optimizer Monorepo",
+  "description": "Smart Campus Lab & Resource Optimizer",
   "workspaces": [
-    "frontend",
-    "backend"
+    "frontend"
   ],
   "scripts": {
     "dev": "npm run dev --workspace=frontend",
-    "build": "npm run build --workspace=frontend",
-    "lint": "npm run lint --workspace=frontend",
-    "dev:backend": "npm run dev --workspace=backend",
-    "dev:frontend": "npm run dev --workspace=frontend"
+    "build": "npm run build --workspace=frontend && mkdir -p dist && cp -r frontend/dist/* dist/",
+    "start": "npm run preview --workspace=frontend",
+    "preview": "npm run preview --workspace=frontend",
+    "lint": "npm run lint --workspace=frontend"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.117.2",
-    "dotenv": "^18.0.5",
-    "drizzle-kit": "^0.31.11",
-    "drizzle-orm": "^0.45.3",
-    "firebase": "^12.19.0",
-    "firebase-admin": "^14.5.0",
-    "pg": "^8.23.1"
-  },
-  "devDependencies": {
-    "@types/pg": "^8.23.1"
+    "dotenv": "^18.0.5"
   }
 }
