@@ -1,0 +1,94 @@
+[
+  {
+    "id": "book_001",
+    "bookingId": "BK-2026-0929-01",
+    "user": "usr_student_01",
+    "userRole": "student",
+    "lab": "lab_d01",
+    "date": "2026-09-30",
+    "startTime": "10:00",
+    "endTime": "12:00",
+    "purpose": "Linux Kernel Device Driver Compilations and Shell Scripting Lab",
+    "requiredResources": ["res_pc_d01_01", "res_disp_d01"],
+    "allocatedResources": ["res_pc_d01_01", "res_disp_d01"],
+    "status": "CONFIRMED",
+    "queuePosition": 0,
+    "requestsAhead": 0,
+    "estimatedStart": "2026-09-30T10:00:00.000Z",
+    "schedulingMetadata": {
+      "priorityScore": 90,
+      "conflictResolution": "direct_allocation",
+      "assignedSlot": "10:00 - 12:00"
+    },
+    "createdAt": "2026-09-28T14:20:00.000Z"
+  },
+  {
+    "id": "book_002",
+    "bookingId": "BK-2026-0929-02",
+    "user": "usr_student_01",
+    "userRole": "student",
+    "lab": "lab_d08",
+    "date": "2026-09-30",
+    "startTime": "14:00",
+    "endTime": "16:00",
+    "purpose": "Deep Learning Object Detection Training on OptiPlex 7000 vPro Node",
+    "requiredResources": ["res_pc_d08_04"],
+    "allocatedResources": [],
+    "status": "QUEUED",
+    "queuePosition": 1,
+    "requestsAhead": 1,
+    "estimatedStart": "2026-09-30T14:30:00.000Z",
+    "schedulingMetadata": {
+      "priorityScore": 75,
+      "conflictResolution": "fifo_queue",
+      "holdExpiresAt": "2026-09-30T14:15:00.000Z"
+    },
+    "createdAt": "2026-09-29T09:10:00.000Z"
+  },
+  {
+    "id": "book_003",
+    "bookingId": "BK-2026-0929-03",
+    "user": "usr_faculty_01",
+    "userRole": "faculty",
+    "lab": "lab_d09",
+    "date": "2026-09-30",
+    "startTime": "13:00",
+    "endTime": "16:00",
+    "purpose": "Advanced Full-Stack Engineering Workshop using 14th Gen Intel i7-14700 Systems",
+    "requiredResources": ["res_pc_d09_02", "res_prn_d09"],
+    "allocatedResources": ["res_pc_d09_02", "res_prn_d09"],
+    "status": "ACTIVE",
+    "queuePosition": 0,
+    "requestsAhead": 0,
+    "estimatedStart": "2026-09-30T13:00:00.000Z",
+    "schedulingMetadata": {
+      "priorityScore": 98,
+      "conflictResolution": "faculty_override",
+      "assignedSlot": "13:00 - 16:00"
+    },
+    "createdAt": "2026-09-27T08:00:00.000Z"
+  },
+  {
+    "id": "book_004",
+    "bookingId": "BK-2026-0929-04",
+    "user": "usr_faculty_01",
+    "userRole": "faculty",
+    "lab": "lab_d02",
+    "date": "2026-09-29",
+    "startTime": "09:00",
+    "endTime": "11:00",
+    "purpose": "Relational Query Optimization and B-Tree Indexing Benchmark",
+    "requiredResources": ["res_pc_d02_01", "res_proj_d02_01"],
+    "allocatedResources": ["res_pc_d02_01", "res_proj_d02_01"],
+    "status": "COMPLETED",
+    "queuePosition": 0,
+    "requestsAhead": 0,
+    "estimatedStart": "2026-09-29T09:00:00.000Z",
+    "schedulingMetadata": {
+      "priorityScore": 92,
+      "conflictResolution": "direct_allocation",
+      "assignedSlot": "09:00 - 11:00"
+    },
+    "createdAt": "2026-09-26T11:30:00.000Z"
+  }
+]

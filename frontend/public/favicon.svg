@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <!-- Background: Official RIT Golden Yellow -->
+  <rect width="400" height="400" fill="#FFC900" rx="20"/>
+
+  <!-- 'r' - Left vertical and top horizontal bar -->
+  <rect x="21" y="148" width="18" height="100" fill="#111111"/>
+  <rect x="21" y="148" width="163" height="19" fill="#111111"/>
+
+  <!-- 'i' - Red square dot and black vertical stem -->
+  <rect x="195" y="116" width="18" height="18" fill="#E11D2A"/>
+  <rect x="195" y="146" width="18" height="102" fill="#111111"/>
+
+  <!-- 't' - Ascender vertical stem, crossbar, and lower horizontal bar -->
+  <rect x="224" y="116" width="18" height="132" fill="#111111"/>
+  <rect x="224" y="147" width="163" height="19" fill="#111111"/>
+  <rect x="224" y="229" width="163" height="19" fill="#111111"/>
+
+  <!-- Subtitle: RAJARAMBAPU INSTITUTE OF TECHNOLOGY -->
+  <text 
+    x="21" 
+    y="278" 
+    fill="#111111" 
+    font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Arial Black', Impact, 'Arial Narrow', sans-serif" 
+    font-size="20" 
+    font-weight="900" 
+    letter-spacing="0.5" 
+    textLength="366" 
+    lengthAdjust="spacingAndGlyphs"
+  >
+    RAJARAMBAPU INSTITUTE OF TECHNOLOGY
+  </text>
+</svg>

@@ -1,11 +1,19 @@
-<div align="center">
+# Smart Campus Lab & Resource Optimizer
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+A full-stack MERN application for managing, booking, and optimizing campus laboratories and resources.
 
-  <h1>Built with AI Studio</h2>
+## Monorepo Layout
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+- `frontend/`: React + Vite + TypeScript frontend with Tailwind CSS and shadcn/ui.
+- `backend/`: Node.js + Express + TypeScript modular monolith backend.
+- `docs/`: Project documentation and design specifications.
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+## Quick Start
 
-</div>
+```bash
+# Install dependencies
+npm run install:all
+
+# Run frontend and backend concurrently in dev mode
+npm run dev
+```
