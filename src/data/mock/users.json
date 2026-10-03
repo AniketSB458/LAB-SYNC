@@ -1,6 +1,6 @@
 [
   {
-    "id": "usr_student_01",
+    "id": "10000000-0000-0000-0000-000000000001",
     "name": "Anya Bandgar",
     "email": "2553018@ritindia.edu",
     "role": "student",
@@ -11,7 +11,7 @@
     "createdAt": "2026-01-15T08:00:00.000Z"
   },
   {
-    "id": "usr_student_02",
+    "id": "10000000-0000-0000-0000-000002553019",
     "name": "Student 2553019",
     "email": "2553019@ritindia.edu",
     "role": "student",
@@ -22,7 +22,7 @@
     "createdAt": "2026-01-15T08:00:00.000Z"
   },
   {
-    "id": "usr_faculty_01",
+    "id": "10000000-0000-0000-0000-000000000003",
     "name": "Prof. Rajesh Patil",
     "email": "faculty@ritindia.edu",
     "role": "faculty",
@@ -33,7 +33,7 @@
     "createdAt": "2025-08-20T08:00:00.000Z"
   },
   {
-    "id": "usr_admin_01",
+    "id": "10000000-0000-0000-0000-000000000005",
     "name": "Dr. Vikramaditya Admin",
     "email": "admin@ritindia.edu",
     "role": "admin",

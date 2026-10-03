@@ -25,6 +25,7 @@ export interface IAuthService {
   register(data: { name: string; email: string; password: string; role: string; department?: string }): Promise<ApiResponse<{ token: string; user: User }>>;
   logout(): Promise<void>;
   getCurrentUser(): Promise<ApiResponse<User>>;
+  getAllUsers?(): Promise<ApiResponse<User[]>>;
 }
 
 export interface IUserService {

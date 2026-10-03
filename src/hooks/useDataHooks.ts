@@ -9,6 +9,7 @@ import {
   maintenanceService,
   notificationService,
   userService,
+  authService,
 } from '../services';
 import {
   LabFilters,
@@ -22,6 +23,20 @@ import {
 } from '../types';
 
 // ============ USER / AUTH HOOKS ============
+export function useAllUsers() {
+  return useQuery({
+    queryKey: ['all-users'],
+    queryFn: async () => {
+      if (typeof authService.getAllUsers === 'function') {
+        const res = await authService.getAllUsers();
+        return res.data || [];
+      }
+      return [];
+    },
+    staleTime: 1000 * 20, // 20s
+  });
+}
+
 export function useCurrentUser() {
   return useQuery({
     queryKey: ['current-user'],

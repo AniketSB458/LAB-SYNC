@@ -16,7 +16,12 @@ interface ToastContextType {
   removeToast: (id: string) => void;
 }
 
-const ToastContext = createContext<ToastContextType | undefined>(undefined);
+const defaultToastContext: ToastContextType = {
+  addToast: () => {},
+  removeToast: () => {},
+};
+
+const ToastContext = createContext<ToastContextType>(defaultToastContext);
 
 export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [toasts, setToasts] = useState<ToastItem[]>([]);
@@ -85,8 +90,5 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
 export const useToast = () => {
   const context = useContext(ToastContext);
-  if (!context) {
-    throw new Error('useToast must be used within a ToastProvider');
-  }
-  return context;
+  return context || defaultToastContext;
 };

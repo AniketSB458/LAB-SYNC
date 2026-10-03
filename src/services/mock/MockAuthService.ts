@@ -1,6 +1,7 @@
 import { IAuthService } from '../types';
 import { User, ApiResponse, Role } from '../../types';
 import { usersData } from '../../data/mock';
+import { getUserUuid } from '../../utils';
 
 const USERS_KEY = 'smart_campus_rit_users_v3';
 const CURRENT_USER_KEY = 'smart_campus_auth_user';
@@ -13,6 +14,11 @@ function getStoredUsers(): User[] {
       if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].email?.endsWith('@ritindia.edu')) {
         let modified = false;
         parsed.forEach((u: User) => {
+          const properId = getUserUuid(u);
+          if (u.id !== properId) {
+            u.id = properId;
+            modified = true;
+          }
           if (/^\d{7}@ritindia\.edu$/i.test(u.email) && u.role !== 'student') {
             u.role = 'student';
             if (u.email === '2553018@ritindia.edu') {
@@ -30,8 +36,12 @@ function getStoredUsers(): User[] {
       // fallback
     }
   }
-  localStorage.setItem(USERS_KEY, JSON.stringify(usersData));
-  return usersData as User[];
+  const initialized = (usersData as any[]).map((u) => ({
+    ...u,
+    id: getUserUuid(u),
+  }));
+  localStorage.setItem(USERS_KEY, JSON.stringify(initialized));
+  return initialized as User[];
 }
 
 export class MockAuthService implements IAuthService {
@@ -149,7 +159,7 @@ export class MockAuthService implements IAuthService {
             .join(' ');
 
       user = {
-        id: `usr_${Date.now()}`,
+        id: getUserUuid({ email: trimmedEmail, role: targetRole }),
         name: capitalizedName || 'RIT Member',
         email: trimmedEmail,
         role: targetRole,
@@ -228,7 +238,7 @@ export class MockAuthService implements IAuthService {
     }
 
     const newUser: User = {
-      id: `usr_${Date.now()}`,
+      id: getUserUuid({ email: trimmedEmail, role: data.role }),
       name: data.name,
       email: trimmedEmail,
       role: data.role as any,

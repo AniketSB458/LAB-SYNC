@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { User, Role } from '../types';
 import { authService } from '../services';
 import { supabase } from '../services/supabase/client';
+import { getUserUuid } from '../utils';
 
 interface AuthContextType {
   user: User | null;
@@ -18,17 +19,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Helper to keep Supabase profiles table in real-time sync with logged in user
+// Helper to keep Supabase profiles table in real-time sync with user
 const syncProfileToSupabase = async (u: User) => {
   try {
-    const userUuid =
-      u.id && u.id.includes('-') && u.id.length === 36
-        ? u.id
-        : u.role === 'admin'
-        ? '10000000-0000-0000-0000-000000000004'
-        : u.role === 'faculty'
-        ? '10000000-0000-0000-0000-000000000002'
-        : '10000000-0000-0000-0000-000000000001';
+    const userUuid = getUserUuid(u);
 
     await supabase.from('profiles').upsert(
       {
@@ -36,7 +30,7 @@ const syncProfileToSupabase = async (u: User) => {
         email: u.email || `${u.role || 'user'}@ritindia.edu`,
         full_name: u.name,
         role: u.role,
-        department: 'Computer Science & Engineering',
+        department: u.department || 'Computer Science & Engineering',
       },
       { onConflict: 'id' }
     );
@@ -73,8 +67,29 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             parsed.name = parsed.name.replace(/^Student \(/, 'Admin (');
             localStorage.setItem('smart_campus_auth_user', JSON.stringify(parsed));
           }
+
+          if (!parsed.id || !parsed.id.includes('-') || parsed.id.length !== 36) {
+            parsed.id = getUserUuid(parsed);
+            localStorage.setItem('smart_campus_auth_user', JSON.stringify(parsed));
+          }
+
           setUser(parsed);
           syncProfileToSupabase(parsed);
+
+          // Synchronize all stored institutional users to Supabase profiles so none are missing
+          try {
+            const storedUsersStr = localStorage.getItem('smart_campus_rit_users_v3');
+            if (storedUsersStr) {
+              const allUsersList: User[] = JSON.parse(storedUsersStr);
+              if (Array.isArray(allUsersList)) {
+                allUsersList.forEach((storedU) => {
+                  syncProfileToSupabase(storedU);
+                });
+              }
+            }
+          } catch {
+            // ignore
+          }
         } catch {
           localStorage.removeItem('smart_campus_auth_user');
           localStorage.removeItem('smart_campus_auth_token');

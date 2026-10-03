@@ -239,7 +239,7 @@ export class MockSlotService {
       database: 'smart_campus_optimizer',
       engine: 'PostgreSQL 16 (Supabase)',
       activeTables: [
-        { name: 'public.profiles', description: 'Institutional Auth & RBAC Profile Store', documents: 3 },
+        { name: 'public.profiles', description: 'Institutional Auth & RBAC Profile Store', documents: 6 },
         { name: 'public.labs', description: 'Normalized Laboratory Hardware Fleet & Facilities', documents: 7 },
         { name: 'public.resources', description: 'Individual Workstations & Hardware Units (WS-D01-01...) with State Machine', documents: 28 },
         { name: 'public.bookings', description: 'Authoritative Reservation Record with ACID commit_booking RPC', documents: 18 },

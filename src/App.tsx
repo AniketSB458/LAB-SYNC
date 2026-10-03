@@ -5,6 +5,7 @@ import { AuthProvider, ThemeProvider } from './hooks';
 import { ToastProvider } from './components/common/Toast';
 import { PandaGuideBot } from './components/common/PandaGuideBot';
 import { AppRoutes } from './routes/AppRoutes';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -18,17 +19,19 @@ const queryClient = new QueryClient({
 
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <BrowserRouter>
-        <AuthProvider>
-          <ThemeProvider>
-            <ToastProvider>
-              <AppRoutes />
-              <PandaGuideBot />
-            </ToastProvider>
-          </ThemeProvider>
-        </AuthProvider>
-      </BrowserRouter>
-    </QueryClientProvider>
+    <ErrorBoundary>
+      <QueryClientProvider client={queryClient}>
+        <BrowserRouter>
+          <AuthProvider>
+            <ThemeProvider>
+              <ToastProvider>
+                <AppRoutes />
+                <PandaGuideBot />
+              </ToastProvider>
+            </ThemeProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </QueryClientProvider>
+    </ErrorBoundary>
   );
 }

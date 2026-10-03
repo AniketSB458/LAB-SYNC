@@ -130,6 +130,7 @@ export const AppRoutes: React.FC = () => {
         <Route path="bookings/:bookingId" element={<BookingDetailsPage />} />
         <Route path="route/:bookingId" element={<CampusRoutePage />} />
         <Route path="monitoring" element={<AdminMonitoringPage />} />
+        <Route path="users" element={<AdminMonitoringPage defaultTab="users" />} />
         <Route path="reports" element={<AdminReportsPage />} />
         <Route path="profile" element={<ProfilePage />} />
       </Route>

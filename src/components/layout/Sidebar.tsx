@@ -13,6 +13,7 @@ import {
   BarChart3,
   Server,
   X,
+  Users,
 } from 'lucide-react';
 import { useAuth } from '../../hooks';
 import { Role } from '../../types';
@@ -57,6 +58,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           { label: 'Inventory & Equipment', href: '/admin/inventory', icon: <Server className="w-4 h-4" /> },
           { label: 'Facilities & Labs', href: '/admin/labs', icon: <Sliders className="w-4 h-4" /> },
           { label: 'Bookings & Queue', href: '/admin/bookings', icon: <BookOpenCheck className="w-4 h-4" /> },
+          { label: 'Users & Directory', href: '/admin/users', icon: <Users className="w-4 h-4" /> },
           { label: 'Master Reports & Audit', href: '/admin/reports', icon: <BarChart3 className="w-4 h-4" /> },
           { label: 'Telemetry & Health', href: '/admin/monitoring', icon: <Activity className="w-4 h-4" /> },
           { label: 'Admin Profile', href: '/admin/profile', icon: <User className="w-4 h-4" /> },

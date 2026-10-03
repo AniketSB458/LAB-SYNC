@@ -168,7 +168,7 @@ export const DFDConstraintConsole: React.FC = () => {
           passed: true,
           message: 'Passed: All user profiles conform to authorized roles.',
           executionTimeMs: 0.01,
-          evidence: { profilesCount: 3, allowedRoles: ['student', 'faculty', 'lab_admin'] },
+          evidence: { profilesCount: 6, allowedRoles: ['student', 'faculty', 'lab_admin', 'admin'] },
         },
         {
           id: 'DFD-C10',

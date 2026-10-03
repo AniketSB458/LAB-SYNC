@@ -1,6 +1,7 @@
 import { IAuthService } from '../types';
 import { User, ApiResponse } from '../../types';
 import { apiClient } from './client';
+import { supabase } from '../supabase/client';
 
 export class ApiAuthService implements IAuthService {
   async login(credentials: { email: string; password: string; role?: any }): Promise<ApiResponse<{ token: string; user: User }>> {
@@ -34,6 +35,31 @@ export class ApiAuthService implements IAuthService {
 
   async getCurrentUser(): Promise<ApiResponse<User>> {
     const res = await apiClient.get('/auth/me');
+    return res.data;
+  }
+
+  async getAllUsers(): Promise<ApiResponse<User[]>> {
+    try {
+      const { data: supaProfiles } = await supabase.from('profiles').select('*');
+      if (supaProfiles && supaProfiles.length > 0) {
+        return {
+          success: true,
+          message: 'Users retrieved from Supabase profiles',
+          data: supaProfiles.map((p: any) => ({
+            id: p.id,
+            name: p.full_name || p.name || (p.email ? p.email.split('@')[0] : 'User'),
+            email: p.email,
+            role: p.role || 'student',
+            department: p.department || 'Computer Science & Engineering',
+            profile: { phone: p.phone || '+91 98765 43210' },
+            createdAt: p.created_at || new Date().toISOString(),
+          })),
+        };
+      }
+    } catch {
+      // fallback
+    }
+    const res = await apiClient.get('/users');
     return res.data;
   }
 }

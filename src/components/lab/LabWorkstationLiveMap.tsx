@@ -18,6 +18,7 @@ import {
 import { supabase } from '../../services/supabase/client';
 import { useAuth } from '../../hooks';
 import { Button, useToast } from '../common';
+import { getUserUuid } from '../../utils';
 
 interface WorkstationItem {
   id: string;
@@ -169,14 +170,7 @@ export const LabWorkstationLiveMap: React.FC<LabWorkstationLiveMapProps> = ({
     setIsBooking(true);
 
     try {
-      const userUuid =
-        user?.id && user.id.includes('-') && user.id.length === 36
-          ? user.id
-          : role === 'admin'
-          ? '10000000-0000-0000-0000-000000000004'
-          : role === 'faculty'
-          ? '10000000-0000-0000-0000-000000000002'
-          : '10000000-0000-0000-0000-000000000001';
+      const userUuid = getUserUuid(user);
 
       // 1. Update PC resource state in Supabase
       await supabase
