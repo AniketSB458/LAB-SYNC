@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   Activity,
   RefreshCw,
@@ -19,6 +19,7 @@ import {
   Users,
   BarChart3,
   Monitor,
+  Database,
 } from 'lucide-react';
 import {
   useLiveMonitoring,
@@ -28,9 +29,13 @@ import {
   useAllBookings,
   useMaintenance,
   useSystemHealth,
-  useAllUsers,
 } from '../../../hooks';
-import { MonitoringCard, StatusOverview, AlertList, SignedInUsersDirectory } from '../../../components/monitoring';
+import {
+  MonitoringCard,
+  StatusOverview,
+  AlertList,
+  SupabaseRealtimeAuditConsole,
+} from '../../../components/monitoring';
 import { Button, StatusBadge, Skeleton, Breadcrumbs } from '../../../components/common';
 import { LabWorkstationLiveMap } from '../../../components/lab';
 import { Lab } from '../../../types';
@@ -38,27 +43,10 @@ import { DFDConstraintConsole } from '../../../components/dfd/DFDConstraintConso
 
 type MonitoringState = 'connected' | 'updating' | 'stale' | 'retrieval error' | 'disconnected' | 'no data';
 
-interface AdminMonitoringPageProps {
-  defaultTab?: 'telemetry' | 'dfd' | 'workstations' | 'users';
-}
-
-export const AdminMonitoringPage: React.FC<AdminMonitoringPageProps> = ({ defaultTab }) => {
+export const AdminMonitoringPage: React.FC = () => {
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab = (searchParams.get('tab') as any) || defaultTab || 'telemetry';
-  const [activeSubTab, setActiveSubTab] = useState<'telemetry' | 'dfd' | 'workstations' | 'users'>(initialTab);
+  const [activeSubTab, setActiveSubTab] = useState<'telemetry' | 'dfd' | 'workstations' | 'audit'>('telemetry');
   const [selectedMonitoringLab, setSelectedMonitoringLab] = useState('e1000000-0000-0000-0000-000000000001');
-
-  useEffect(() => {
-    const tabParam = searchParams.get('tab');
-    if (tabParam && ['telemetry', 'dfd', 'workstations', 'users'].includes(tabParam)) {
-      setActiveSubTab(tabParam as any);
-    } else if (defaultTab) {
-      setActiveSubTab(defaultTab);
-    }
-  }, [searchParams, defaultTab]);
-
-  const { data: allUsers = [] } = useAllUsers();
   // Controlled polling interval: 20s via TanStack Query
   const {
     data: overview,
@@ -240,10 +228,7 @@ export const AdminMonitoringPage: React.FC<AdminMonitoringPageProps> = ({ defaul
         </button>
         <button
           type="button"
-          onClick={() => {
-            setActiveSubTab('workstations');
-            setSearchParams({ tab: 'workstations' });
-          }}
+          onClick={() => setActiveSubTab('workstations')}
           className={`flex items-center gap-2 px-3 py-2 font-medium whitespace-nowrap transition-colors ${
             activeSubTab === 'workstations'
               ? 'border-b-2 border-indigo-500 text-indigo-400 font-bold'
@@ -255,21 +240,15 @@ export const AdminMonitoringPage: React.FC<AdminMonitoringPageProps> = ({ defaul
         </button>
         <button
           type="button"
-          onClick={() => {
-            setActiveSubTab('users');
-            setSearchParams({ tab: 'users' });
-          }}
+          onClick={() => setActiveSubTab('audit')}
           className={`flex items-center gap-2 px-3 py-2 font-medium whitespace-nowrap transition-colors ${
-            activeSubTab === 'users'
-              ? 'border-b-2 border-indigo-500 text-indigo-400 font-bold'
+            activeSubTab === 'audit'
+              ? 'border-b-2 border-emerald-500 text-emerald-400 font-bold'
               : 'text-slate-400 hover:text-slate-200'
           }`}
         >
-          <Users className="w-3.5 h-3.5 text-violet-400" />
-          <span>Signed-In Users & Accounts</span>
-          <span className="px-1.5 py-0.2 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-            {allUsers.length}
-          </span>
+          <Database className="w-3.5 h-3.5 text-emerald-400" />
+          <span>Supabase Realtime Audit Log</span>
         </button>
         <button
           type="button"
@@ -317,9 +296,7 @@ export const AdminMonitoringPage: React.FC<AdminMonitoringPageProps> = ({ defaul
         </div>
       </div>
 
-      {activeSubTab === 'users' ? (
-        <SignedInUsersDirectory />
-      ) : activeSubTab === 'dfd' ? (
+      {activeSubTab === 'dfd' ? (
         <DFDConstraintConsole />
       ) : activeSubTab === 'workstations' ? (
         <div className="space-y-4">
@@ -521,6 +498,13 @@ export const AdminMonitoringPage: React.FC<AdminMonitoringPageProps> = ({ defaul
         </div>
       </div>
         </>
+      )}
+
+      {/* SUBTAB 4: Supabase Realtime Audit Log */}
+      {activeSubTab === 'audit' && (
+        <div className="space-y-6 animate-in fade-in duration-200">
+          <SupabaseRealtimeAuditConsole />
+        </div>
       )}
     </div>
   );

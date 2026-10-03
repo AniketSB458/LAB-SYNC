@@ -24,6 +24,7 @@ import {
 import { Lab, Resource, BookingStatus } from '../../types';
 import { Button, Input, Select, ErrorMessage, StatusBadge } from '../common';
 import { useCreateBooking, useLabs, useResources, useAuth } from '../../hooks';
+import { recordAuditLog } from '../../services/supabase/auditLog.service';
 
 // Validation Schema with Zod
 const bookingSchema = z
@@ -201,6 +202,31 @@ export const BookingForm: React.FC<BookingFormProps> = ({
 
       const newBookingId = res.bookingId || res.id;
       const resStatus = res.status;
+
+      // Broadcast activity directly to Supabase audit_log Realtime stream
+      recordAuditLog({
+        action:
+          resStatus === 'QUEUED'
+            ? 'LAB_RESERVATION_QUEUED'
+            : resStatus === 'REJECTED'
+            ? 'LAB_RESERVATION_REJECTED'
+            : 'LAB_RESERVATION_CONFIRMED',
+        actorId: user?.id,
+        actorName: user?.name || user?.email || 'Student User',
+        actorRole: user?.role || 'student',
+        correlationId: `corr-${newBookingId}`,
+        before: null,
+        after: {
+          bookingId: newBookingId,
+          labId: selectedLab?.id || selectedLabId,
+          labName: selectedLab?.name || 'Academic Laboratory',
+          date: selectedDate,
+          timeSlot: `${selectedStartTime} - ${selectedEndTime}`,
+          purpose: enteredPurpose,
+          status: resStatus,
+          timestamp: new Date().toISOString(),
+        },
+      }).catch((e) => console.warn('[Supabase Realtime] Booking audit notice:', e));
 
       if (resStatus === 'QUEUED') {
         setSubmissionOutcome({

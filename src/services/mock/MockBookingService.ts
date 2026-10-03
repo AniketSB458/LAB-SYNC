@@ -1,6 +1,7 @@
 import { IBookingService } from '../types';
 import { Booking, BookingFilters, ApiResponse, SchedulingResult, BookingStatus } from '../../types';
 import { bookingsData } from '../../data/mock';
+import { recordAuditLog } from '../supabase/auditLog.service';
 
 const BOOKINGS_KEY = 'smart_campus_real_bookings_v2';
 
@@ -196,6 +197,32 @@ export class MockBookingService implements IBookingService {
     all.unshift(newBooking);
     saveBookings(all);
 
+    // Record activity in Supabase audit_log table and stream via Realtime
+    recordAuditLog({
+      action:
+        status === 'CONFIRMED'
+          ? 'LAB_RESERVATION_CONFIRMED'
+          : status === 'QUEUED'
+          ? 'LAB_RESERVATION_QUEUED'
+          : 'LAB_RESERVATION_REJECTED',
+      actorId: user.id,
+      actorName: user.name || user.email || 'Student User',
+      actorRole: user.role || 'student',
+      correlationId: `corr-${newBooking.bookingId}`,
+      before: null,
+      after: {
+        bookingId: newBooking.bookingId,
+        labId: data.labId,
+        date: data.date,
+        timeSlot: `${data.startTime} - ${data.endTime}`,
+        purpose: data.purpose,
+        status: newBooking.status,
+        queuePosition: newBooking.queuePosition,
+        requiredResources: data.requiredResources || [],
+        evaluatedAt: new Date().toISOString(),
+      },
+    }).catch((e) => console.warn('[Supabase Realtime] Booking audit notice:', e));
+
     const schedulingResult: SchedulingResult = {
       bookingId: newBooking.bookingId,
       status: newBooking.status,
@@ -229,10 +256,25 @@ export class MockBookingService implements IBookingService {
       };
     }
 
+    const prevStatus = all[index].status;
     all[index].status = 'CANCELLED';
     all[index].cancellationReason = cancellationReason || 'Cancelled by user';
     all[index].updatedAt = new Date().toISOString();
     saveBookings(all);
+
+    // Stream cancellation to Supabase audit_log
+    recordAuditLog({
+      action: 'LAB_RESERVATION_CANCELLED',
+      actorId: all[index].user as any,
+      correlationId: `corr-cancel-${all[index].bookingId}`,
+      before: { status: prevStatus, bookingId: all[index].bookingId },
+      after: {
+        status: 'CANCELLED',
+        cancellationReason: all[index].cancellationReason,
+        bookingId: all[index].bookingId,
+        labId: all[index].lab,
+      },
+    }).catch((e) => console.warn('[Supabase Realtime] Cancel audit notice:', e));
 
     return {
       success: true,

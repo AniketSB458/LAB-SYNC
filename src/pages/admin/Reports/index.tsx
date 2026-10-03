@@ -32,6 +32,7 @@ import {
   ReportFilterPanel,
 } from '../../../components/reports';
 import { Breadcrumbs, Skeleton, Table, Column, Button, Select, useToast } from '../../../components/common';
+import { SupabaseRealtimeAuditConsole } from '../../../components/monitoring';
 import { LabUtilizationReport, ResourceUtilizationReport } from '../../../types';
 
 // Official Institutional Laboratory Master Audit dataset from the 3NF Master Register (Page 1 of Workbook)
@@ -466,6 +467,9 @@ export const AdminReportsPage: React.FC = () => {
       {/* ======================================================== */}
       {activeTab === 'audit' && (
         <div className="space-y-6">
+          {/* Supabase Realtime Live Audit Stream */}
+          <SupabaseRealtimeAuditConsole />
+
           {/* Institutional KPI Overview */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             <div className="glass-card p-4 rounded-xl border border-slate-800 bg-slate-900/60 space-y-1">

@@ -16,6 +16,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { supabase } from '../../services/supabase/client';
+import { recordAuditLog } from '../../services/supabase/auditLog.service';
 import { useAuth } from '../../hooks';
 import { Button, useToast } from '../common';
 import { getUserUuid } from '../../utils';
@@ -191,6 +192,24 @@ export const LabWorkstationLiveMap: React.FC<LabWorkstationLiveMapProps> = ({
           idempotency_key: `booking-${pc.label}-${Date.now()}`,
         },
       ]);
+
+      // 3. Record in Supabase audit_log Realtime Stream
+      recordAuditLog({
+        action: 'WORKSTATION_BENCH_OCCUPIED',
+        actorId: userUuid,
+        actorName: user?.name || user?.email || 'Student User',
+        actorRole: user?.role || 'student',
+        correlationId: `corr-bench-${pc.label}-${Date.now()}`,
+        before: { resourceId: pc.id, previousState: pc.state },
+        after: {
+          resourceId: pc.id,
+          workstationLabel: pc.label,
+          labId: pc.labId,
+          newState: 'ALLOCATED',
+          allocatedTo: user?.name || user?.email,
+          timestamp: new Date().toISOString(),
+        },
+      }).catch((e) => console.warn('[Supabase Realtime] Workstation audit notice:', e));
 
       addToast({
         type: 'success',

@@ -269,6 +269,13 @@ export const LoginPage: React.FC = () => {
         <p className="text-[11px]">
           Smart Campus Resource Management System
         </p>
+        <p
+          className={`text-[10px] font-mono font-bold tracking-wider uppercase mt-1 ${
+            isGoldPink ? 'text-pink-600' : 'text-slate-400'
+          }`}
+        >
+          MADE BY 458TM
+        </p>
       </div>
     </div>
   );

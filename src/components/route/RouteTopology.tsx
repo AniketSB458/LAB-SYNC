@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { NesPandaSprite } from './NesPandaSprite';
 import { useDeviceLocation, useTheme } from '../../hooks';
+import { recordAuditLog } from '../../services/supabase/auditLog.service';
 
 export interface RouteTopologyProps {
   nodes: RouteNode[];
@@ -108,6 +109,20 @@ export const RouteTopology: React.FC<RouteTopologyProps> = ({
   const handleNextStep = () => {
     if (stepIndex < activePath.length - 1) {
       const nextIdx = stepIndex + 1;
+      const nextNodeName = nodeMap.current.get(activePath[nextIdx])?.name || activePath[nextIdx];
+      
+      // Stream step completion to Supabase Realtime
+      recordAuditLog({
+        action: 'CAMPUS_WAYFINDING_STEP_COMPLETED',
+        correlationId: `corr-waypoint-${nextIdx}-${Date.now()}`,
+        after: {
+          stepIndex: nextIdx + 1,
+          totalSteps: activePath.length,
+          arrivedAtWaypoint: nextNodeName,
+          timestamp: new Date().toISOString(),
+        },
+      }).catch((e) => console.warn('Supabase audit notice:', e));
+
       if (onStepChange) onStepChange(nextIdx);
       else setInternalStepIndex(nextIdx);
     }
