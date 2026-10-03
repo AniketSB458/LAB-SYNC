@@ -13,9 +13,8 @@ import {
   BarChart3,
   Server,
   X,
-  Users,
 } from 'lucide-react';
-import { useAuth } from '../../hooks';
+import { useAuth, useTheme } from '../../hooks';
 import { Role } from '../../types';
 import { RITLogo } from '../common';
 
@@ -32,6 +31,7 @@ interface NavItem {
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { role } = useAuth();
+  const { isGoldPink } = useTheme();
 
   const getNavItems = (currentRole: Role | null): NavItem[] => {
     switch (currentRole) {
@@ -58,7 +58,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
           { label: 'Inventory & Equipment', href: '/admin/inventory', icon: <Server className="w-4 h-4" /> },
           { label: 'Facilities & Labs', href: '/admin/labs', icon: <Sliders className="w-4 h-4" /> },
           { label: 'Bookings & Queue', href: '/admin/bookings', icon: <BookOpenCheck className="w-4 h-4" /> },
-          { label: 'Users & Directory', href: '/admin/users', icon: <Users className="w-4 h-4" /> },
           { label: 'Master Reports & Audit', href: '/admin/reports', icon: <BarChart3 className="w-4 h-4" /> },
           { label: 'Telemetry & Health', href: '/admin/monitoring', icon: <Activity className="w-4 h-4" /> },
           { label: 'Admin Profile', href: '/admin/profile', icon: <User className="w-4 h-4" /> },
@@ -131,13 +130,21 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
         </nav>
 
         {/* Footer info badge */}
-        <div className="p-3 border-t border-slate-800/80">
-          <div className="p-2.5 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center gap-2.5 text-[11px] text-slate-400">
-            <RITLogo className="w-7 h-7 shrink-0" variant="mark" rounded="lg" />
-            <div className="min-w-0">
-              <p className="font-semibold text-slate-200 text-xs truncate">RIT Rajarambapu</p>
-              <p className="text-[10px] text-slate-400 truncate">Institute of Technology</p>
-            </div>
+        <div className={`p-3 border-t ${isGoldPink ? 'border-pink-200/70' : 'border-slate-800/80'}`}>
+          <div
+            className={`py-2 px-3 rounded-xl border flex items-center justify-center text-center transition-colors ${
+              isGoldPink
+                ? 'bg-pink-50/70 border-pink-200/90 shadow-sm'
+                : 'bg-slate-900/60 border-slate-800'
+            }`}
+          >
+            <span
+              className={`font-mono font-bold text-xs tracking-wider uppercase ${
+                isGoldPink ? 'text-pink-700' : 'text-slate-200'
+              }`}
+            >
+              Made BY 458TM
+            </span>
           </div>
         </div>
       </aside>
