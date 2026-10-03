@@ -1,0 +1,46 @@
+[
+  {
+    "id": "usr_student_01",
+    "name": "Anya Bandgar",
+    "email": "2553018@ritindia.edu",
+    "role": "student",
+    "department": "Computer Science & Engineering",
+    "profile": {
+      "phone": "+91 98765 43210"
+    },
+    "createdAt": "2026-01-15T08:00:00.000Z"
+  },
+  {
+    "id": "usr_student_02",
+    "name": "Student 2553019",
+    "email": "2553019@ritindia.edu",
+    "role": "student",
+    "department": "Computer Science & Engineering",
+    "profile": {
+      "phone": "+91 98765 43211"
+    },
+    "createdAt": "2026-01-15T08:00:00.000Z"
+  },
+  {
+    "id": "usr_faculty_01",
+    "name": "Prof. Rajesh Patil",
+    "email": "faculty@ritindia.edu",
+    "role": "faculty",
+    "department": "Computer Science & Engineering",
+    "profile": {
+      "phone": "+91 98220 12345"
+    },
+    "createdAt": "2025-08-20T08:00:00.000Z"
+  },
+  {
+    "id": "usr_admin_01",
+    "name": "Dr. Vikramaditya Admin",
+    "email": "admin@ritindia.edu",
+    "role": "admin",
+    "department": "Campus Resource Administration",
+    "profile": {
+      "phone": "+91 94220 98765"
+    },
+    "createdAt": "2025-01-10T08:00:00.000Z"
+  }
+]
