@@ -43,9 +43,15 @@ import { DFDConstraintConsole } from '../../../components/dfd/DFDConstraintConso
 
 type MonitoringState = 'connected' | 'updating' | 'stale' | 'retrieval error' | 'disconnected' | 'no data';
 
-export const AdminMonitoringPage: React.FC = () => {
+interface AdminMonitoringPageProps {
+  defaultTab?: string;
+}
+
+export const AdminMonitoringPage: React.FC<AdminMonitoringPageProps> = ({ defaultTab }) => {
   const navigate = useNavigate();
-  const [activeSubTab, setActiveSubTab] = useState<'telemetry' | 'dfd' | 'workstations' | 'audit'>('telemetry');
+  const [activeSubTab, setActiveSubTab] = useState<'telemetry' | 'dfd' | 'workstations' | 'audit'>(
+    defaultTab === 'audit' || defaultTab === 'users' ? 'audit' : 'telemetry'
+  );
   const [selectedMonitoringLab, setSelectedMonitoringLab] = useState('e1000000-0000-0000-0000-000000000001');
   // Controlled polling interval: 20s via TanStack Query
   const {

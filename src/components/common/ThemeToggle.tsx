@@ -53,8 +53,8 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '', showDr
       dot1: 'bg-indigo-500',
       dot2: 'bg-cyan-400',
       icon: <Sparkles className="w-3.5 h-3.5 text-indigo-400" />,
-      activeBorder: 'border-indigo-500 ring-2 ring-indigo-500/30 shadow-indigo-900/30',
-      activeBg: 'bg-indigo-950/40 text-indigo-200',
+      activeBorder: 'border-indigo-400 ring-2 ring-indigo-500/50 shadow-indigo-950',
+      activeBg: 'bg-indigo-950 text-indigo-100 font-bold shadow-md shadow-indigo-950',
     },
     {
       id: 'emerald-mint',
@@ -64,8 +64,8 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '', showDr
       dot1: 'bg-emerald-500',
       dot2: 'bg-teal-300',
       icon: <Leaf className="w-3.5 h-3.5 text-emerald-400" />,
-      activeBorder: 'border-emerald-500 ring-2 ring-emerald-500/30 shadow-emerald-900/30',
-      activeBg: 'bg-emerald-950/40 text-emerald-200',
+      activeBorder: 'border-emerald-400 ring-2 ring-emerald-500/50 shadow-emerald-950',
+      activeBg: 'bg-emerald-950 text-emerald-100 font-bold shadow-md shadow-emerald-950',
     },
   ];
 
@@ -88,8 +88,8 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '', showDr
           isGoldPink
             ? 'bg-white border-pink-300 hover:border-pink-400 text-pink-700 shadow-sm shadow-pink-200/50'
             : isEmeraldMint
-            ? 'bg-emerald-950/70 border-emerald-500/40 hover:border-emerald-400 text-emerald-300 shadow-md shadow-emerald-950/40'
-            : 'bg-slate-900/90 border-slate-700/80 hover:border-indigo-500/50 text-slate-300 hover:text-white shadow-md shadow-slate-950/40'
+            ? 'bg-emerald-950 border-emerald-500/60 hover:border-emerald-400 text-emerald-100 shadow-lg shadow-emerald-950 font-medium'
+            : 'bg-slate-900 border-indigo-500/50 hover:border-indigo-400 text-slate-100 hover:text-white shadow-lg shadow-slate-950 font-medium'
         }`}
         aria-label="Toggle Theme"
         aria-expanded={isOpen}
@@ -148,14 +148,18 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '', showDr
               isGoldPink
                 ? 'bg-white/98 border-pink-200 shadow-pink-900/10 text-slate-800'
                 : isEmeraldMint
-                ? 'bg-slate-950/98 border-emerald-500/30 shadow-emerald-950/80 text-slate-100'
-                : 'bg-slate-950/98 border-slate-800 shadow-slate-950/90 text-slate-100'
+                ? 'bg-slate-950 border-emerald-500/50 shadow-emerald-950/95 text-slate-100'
+                : 'bg-slate-950 border-indigo-500/50 shadow-slate-950/95 text-slate-100'
             }`}
           >
             {/* Header */}
             <div
               className={`flex items-center justify-between pb-2 mb-2 border-b px-1 text-xs font-bold uppercase tracking-wider ${
-                isGoldPink ? 'border-pink-100 text-slate-500' : 'border-slate-800/80 text-slate-400'
+                isGoldPink
+                  ? 'border-pink-100 text-slate-500'
+                  : isEmeraldMint
+                  ? 'border-emerald-900/80 text-emerald-400'
+                  : 'border-slate-800/80 text-indigo-400'
               }`}
             >
               <div className="flex items-center gap-1.5">
@@ -183,8 +187,8 @@ export const ThemeToggle: React.FC<ThemeToggleProps> = ({ className = '', showDr
                         : isGoldPink
                         ? 'bg-slate-50/80 border-slate-200/90 hover:bg-pink-50/50 hover:border-pink-200 text-slate-700'
                         : isEmeraldMint
-                        ? 'bg-slate-900/60 border-slate-800/80 hover:bg-emerald-950/40 hover:border-emerald-500/30 text-slate-300'
-                        : 'bg-slate-900/60 border-slate-800/80 hover:bg-slate-800/60 hover:border-slate-700 text-slate-300'
+                        ? 'bg-slate-900 border-slate-800 hover:bg-emerald-950 hover:border-emerald-500/50 text-slate-200'
+                        : 'bg-slate-900 border-slate-800 hover:bg-slate-850 hover:border-indigo-500/50 text-slate-200'
                     }`}
                   >
                     {/* Active Checkmark Pin */}

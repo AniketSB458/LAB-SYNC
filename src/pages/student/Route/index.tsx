@@ -4,11 +4,12 @@ import { ArrowLeft, RefreshCw, Compass, Sparkles } from 'lucide-react';
 import { useCampusRoute, useBooking, useAuth, useTheme } from '../../../hooks';
 import { RouteTopology, RouteSummary } from '../../../components/route';
 import { Button, Breadcrumbs, Skeleton, ErrorMessage } from '../../../components/common';
+import { recordAuditLog } from '../../../services/supabase/auditLog.service';
 
 export const CampusRoutePage: React.FC = () => {
   const { bookingId } = useParams<{ bookingId: string }>();
   const navigate = useNavigate();
-  const { role } = useAuth();
+  const { role, user } = useAuth();
   const { isGoldPink, isEmeraldMint } = useTheme();
   const basePrefix = role === 'admin' ? '/admin' : role === 'faculty' ? '/faculty' : '/student';
 
@@ -16,6 +17,29 @@ export const CampusRoutePage: React.FC = () => {
 
   const { data: booking } = useBooking(bookingId);
   const { data: route, isLoading, error, refetch, isRefetching } = useCampusRoute(bookingId);
+
+  // Broadcast route navigation start event with user email
+  React.useEffect(() => {
+    if (route && user?.email) {
+      recordAuditLog({
+        action: 'CAMPUS_WAYFINDING_ROUTE_ACCESSED',
+        actorId: user.id,
+        actorName: user.name,
+        actorRole: user.role,
+        actorEmail: user.email,
+        correlationId: `corr-route-${bookingId || 'direct'}-${Date.now()}`,
+        after: {
+          bookingId,
+          source: route.source,
+          destination: route.destination,
+          email: user.email,
+          userEmail: user.email,
+          actorEmail: user.email,
+          timestamp: new Date().toISOString(),
+        },
+      }).catch((e) => console.warn('Supabase route audit notice:', e));
+    }
+  }, [route?.destination, user?.email, bookingId]);
 
   if (isLoading) {
     return (

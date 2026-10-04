@@ -23,3 +23,4 @@ export * from './ThemeToggle';
 export * from './PandaGuideBot';
 export * from './RITLogo';
 export * from './AuthDetailsModal';
+export * from './ErrorBoundary';

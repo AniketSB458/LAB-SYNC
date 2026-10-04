@@ -10,7 +10,7 @@ import {
   Layers,
   Sparkles,
 } from 'lucide-react';
-import { useAuth } from '../../hooks';
+import { useAuth, useTheme } from '../../hooks';
 import { useNotifications } from '../../hooks';
 import { Role } from '../../types';
 import { ThemeToggle, RITLogo, AuthDetailsModal } from '../common';
@@ -24,6 +24,7 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isSidebarOpen }) => {
   const { user, role, logout } = useAuth();
+  const { isGoldPink, isEmeraldMint } = useTheme();
   const { data: notifications = [], markAsRead, markAllAsRead } = useNotifications();
   const navigate = useNavigate();
 
@@ -176,12 +177,38 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isSidebarOpen }
                   className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-xs sm:hidden"
                   onClick={() => setShowNotifMenu(false)}
                 />
-                <div className="fixed sm:absolute inset-x-3 top-16 sm:inset-x-auto sm:right-0 sm:top-full mt-1.5 w-auto sm:w-96 max-w-sm rounded-2xl bg-slate-900/98 backdrop-blur-xl border border-slate-800 shadow-2xl p-3.5 sm:p-4 z-50 animate-in fade-in slide-in-from-top-2">
-                  <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <div
+                  className={`fixed sm:absolute inset-x-3 top-16 sm:inset-x-auto sm:right-0 sm:top-full mt-1.5 w-auto sm:w-96 max-w-sm rounded-2xl border shadow-2xl p-3.5 sm:p-4 z-50 animate-in fade-in slide-in-from-top-2 ${
+                    isGoldPink
+                      ? 'bg-white border-pink-200 text-slate-800'
+                      : isEmeraldMint
+                      ? 'bg-slate-950 border-emerald-500/50 shadow-emerald-950/95 text-slate-100'
+                      : 'bg-slate-950 border-indigo-500/50 shadow-slate-950/95 text-slate-100'
+                  }`}
+                >
+                  <div
+                    className={`flex items-center justify-between pb-3 border-b ${
+                      isGoldPink ? 'border-pink-100' : isEmeraldMint ? 'border-emerald-900/60' : 'border-slate-800'
+                    }`}
+                  >
                   <div className="flex items-center gap-2">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200">System Notifications</h4>
+                    <h4
+                      className={`text-xs font-bold uppercase tracking-wider ${
+                        isGoldPink ? 'text-slate-800' : isEmeraldMint ? 'text-emerald-300' : 'text-slate-200'
+                      }`}
+                    >
+                      System Notifications
+                    </h4>
                     {unreadCount > 0 && (
-                      <span className="px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400 text-[10px] font-bold">
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                          isGoldPink
+                            ? 'bg-pink-100 text-pink-700'
+                            : isEmeraldMint
+                            ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30'
+                            : 'bg-indigo-500/20 text-indigo-400 border border-indigo-500/30'
+                        }`}
+                      >
                         {unreadCount} new
                       </span>
                     )}
@@ -189,7 +216,9 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isSidebarOpen }
                   {unreadCount > 0 && (
                     <button
                       onClick={() => markAllAsRead.mutate()}
-                      className="text-[11px] text-indigo-400 hover:text-indigo-300 font-medium transition-colors"
+                      className={`text-[11px] font-medium transition-colors ${
+                        isGoldPink ? 'text-pink-600 hover:text-pink-700' : isEmeraldMint ? 'text-emerald-400 hover:text-emerald-300' : 'text-indigo-400 hover:text-indigo-300'
+                      }`}
                     >
                       Mark all as read
                     </button>
@@ -208,28 +237,60 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isSidebarOpen }
                             markAsRead.mutate(n.id);
                           }
                         }}
-                        className={`py-2 px-2.5 sm:py-2.5 sm:px-3 rounded-xl transition-colors cursor-pointer ${
+                        className={`py-2 px-2.5 sm:py-2.5 sm:px-3 rounded-xl transition-all cursor-pointer ${
                           !n.read
-                            ? 'bg-indigo-950/30 border border-indigo-500/20 hover:bg-indigo-900/30'
-                            : 'hover:bg-slate-800/60'
+                            ? isGoldPink
+                              ? 'bg-pink-50 border border-pink-200 hover:bg-pink-100 text-slate-800'
+                              : isEmeraldMint
+                              ? 'bg-emerald-950 border border-emerald-500/50 hover:bg-emerald-900 text-slate-100 shadow-sm'
+                              : 'bg-indigo-950 border border-indigo-500/50 hover:bg-indigo-900 text-slate-100 shadow-sm'
+                            : isGoldPink
+                            ? 'hover:bg-slate-100 text-slate-700'
+                            : isEmeraldMint
+                            ? 'bg-slate-900/90 border border-slate-800/80 hover:bg-emerald-950/70 text-slate-300'
+                            : 'bg-slate-900/90 border border-slate-800/80 hover:bg-slate-800 text-slate-300'
                         }`}
                       >
                         <div className="flex items-center justify-between gap-2">
                           <div className="flex items-center gap-1.5 min-w-0">
-                            {!n.read && <span className="w-1.5 h-1.5 rounded-full bg-indigo-400 shrink-0" />}
-                            <span className="text-xs font-bold text-slate-200 truncate">{n.title}</span>
+                            {!n.read && (
+                              <span
+                                className={`w-2 h-2 rounded-full shrink-0 ${
+                                  isGoldPink ? 'bg-pink-500' : isEmeraldMint ? 'bg-emerald-400' : 'bg-indigo-400'
+                                }`}
+                              />
+                            )}
+                            <span
+                              className={`text-xs font-bold truncate ${
+                                isGoldPink ? 'text-slate-800' : 'text-slate-100'
+                              }`}
+                            >
+                              {n.title}
+                            </span>
                           </div>
-                          <span className="text-[10px] text-slate-500 font-mono shrink-0">
+                          <span className="text-[10px] text-slate-400 font-mono shrink-0">
                             {new Date(n.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-400 mt-1 leading-snug break-words">{n.message}</p>
+                        <p className={`text-xs mt-1 leading-snug break-words ${isGoldPink ? 'text-slate-600' : 'text-slate-300'}`}>
+                          {n.message}
+                        </p>
                         <div className="mt-1.5 flex items-center justify-between">
-                          <span className="text-[9px] uppercase font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400">
+                          <span
+                            className={`text-[9px] uppercase font-mono px-1.5 py-0.2 rounded ${
+                              isGoldPink ? 'bg-slate-200 text-slate-700' : isEmeraldMint ? 'bg-emerald-900/80 text-emerald-300' : 'bg-slate-800 text-slate-300'
+                            }`}
+                          >
                             {n.type || 'info'}
                           </span>
                           {!n.read && (
-                            <span className="text-[10px] text-indigo-400 hover:underline">Mark read</span>
+                            <span
+                              className={`text-[10px] hover:underline ${
+                                isGoldPink ? 'text-pink-600' : isEmeraldMint ? 'text-emerald-400' : 'text-indigo-400'
+                              }`}
+                            >
+                              Mark read
+                            </span>
                           )}
                         </div>
                       </div>
@@ -248,17 +309,31 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isSidebarOpen }
                 setShowUserMenu(!showUserMenu);
                 setShowNotifMenu(false);
               }}
-              className="flex items-center gap-1.5 sm:gap-2.5 p-1 sm:p-1.5 sm:pl-2 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-800 transition-all text-left"
+              className={`flex items-center gap-1.5 sm:gap-2.5 p-1 sm:p-1.5 sm:pl-2 rounded-xl border transition-all text-left ${
+                isGoldPink
+                  ? 'bg-white border-pink-200 hover:border-pink-300 text-slate-800 shadow-sm'
+                  : isEmeraldMint
+                  ? 'bg-emerald-950 border-emerald-500/50 hover:border-emerald-400 text-emerald-100 shadow-lg shadow-emerald-950/60 font-medium'
+                  : 'bg-slate-900 border-indigo-500/50 hover:border-indigo-400 text-slate-100 shadow-lg shadow-slate-950/60 font-medium'
+              }`}
               aria-label="User Profile"
             >
-              <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center shrink-0">
-                <UserIcon className="w-4 h-4 text-indigo-400" />
+              <div
+                className={`w-7 h-7 rounded-lg flex items-center justify-center shrink-0 border ${
+                  isGoldPink
+                    ? 'bg-pink-100 border-pink-200 text-pink-700'
+                    : isEmeraldMint
+                    ? 'bg-emerald-900 border-emerald-400/50 text-emerald-300'
+                    : 'bg-indigo-950 border-indigo-400/50 text-indigo-300'
+                }`}
+              >
+                <UserIcon className="w-4 h-4" />
               </div>
               <div className="hidden md:block">
-                <p className="text-xs font-medium text-slate-200 leading-tight">{userDisplayName}</p>
-                <p className="text-[10px] text-slate-400 capitalize">{role || 'User'}</p>
+                <p className="text-xs font-semibold leading-tight">{userDisplayName}</p>
+                <p className={`text-[10px] capitalize ${isGoldPink ? 'text-slate-500' : 'text-slate-400'}`}>{role || 'User'}</p>
               </div>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-500 hidden sm:block" />
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 hidden sm:block" />
             </button>
 
             {showUserMenu && (
@@ -267,23 +342,47 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isSidebarOpen }
                   className="fixed inset-0 z-40 bg-slate-950/60 backdrop-blur-xs sm:hidden"
                   onClick={() => setShowUserMenu(false)}
                 />
-                <div className="fixed sm:absolute inset-x-3 top-16 sm:inset-x-auto sm:right-0 sm:top-full mt-1.5 w-auto sm:w-64 max-w-sm rounded-xl bg-slate-900/98 backdrop-blur-xl border border-slate-800 shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2">
-                  <div className="px-3 py-2 border-b border-slate-800">
-                    <p className="text-xs font-bold text-slate-200">{userDisplayName}</p>
-                    <p className="text-[11px] text-slate-400 truncate">{user?.email}</p>
-                    <span className="inline-block mt-1 text-[10px] font-semibold uppercase px-2 py-0.5 rounded bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+                <div
+                  className={`fixed sm:absolute inset-x-3 top-16 sm:inset-x-auto sm:right-0 sm:top-full mt-1.5 w-auto sm:w-64 max-w-sm rounded-xl border shadow-2xl p-2 z-50 animate-in fade-in slide-in-from-top-2 ${
+                    isGoldPink
+                      ? 'bg-white border-pink-200 text-slate-800'
+                      : isEmeraldMint
+                      ? 'bg-slate-950 border-emerald-500/50 shadow-emerald-950/95 text-slate-100'
+                      : 'bg-slate-950 border-indigo-500/50 shadow-slate-950/95 text-slate-100'
+                  }`}
+                >
+                  <div
+                    className={`px-3 py-2 border-b ${
+                      isGoldPink ? 'border-pink-100' : isEmeraldMint ? 'border-emerald-900/60' : 'border-slate-800'
+                    }`}
+                  >
+                    <p className="text-xs font-bold">{userDisplayName}</p>
+                    <p className={`text-[11px] truncate ${isGoldPink ? 'text-slate-500' : 'text-slate-400'}`}>{user?.email}</p>
+                    <span
+                      className={`inline-block mt-1 text-[10px] font-semibold uppercase px-2 py-0.5 rounded border ${
+                        isGoldPink
+                          ? 'bg-pink-100 text-pink-700 border-pink-200'
+                          : isEmeraldMint
+                          ? 'bg-emerald-950 text-emerald-300 border-emerald-500/40'
+                          : 'bg-indigo-950 text-indigo-300 border-indigo-500/40'
+                      }`}
+                    >
                       Role: {role}
                     </span>
                   </div>
 
-                  <div className="py-1">
+                  <div className="py-1 space-y-0.5">
                     <button
                       type="button"
                       onClick={() => {
                         setShowUserMenu(false);
                         setShowAuthModal(true);
                       }}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-emerald-400 hover:text-emerald-300 hover:bg-emerald-500/10 rounded-lg transition-colors text-left font-medium"
+                      className={`w-full flex items-center gap-2 px-3 py-2 text-xs rounded-lg transition-colors text-left font-medium ${
+                        isEmeraldMint
+                          ? 'text-emerald-300 hover:bg-emerald-950'
+                          : 'text-indigo-300 hover:bg-indigo-950'
+                      }`}
                     >
                       <ShieldCheck className="w-4 h-4 text-emerald-400" />
                       <span>Live Auth & Session Details</span>
@@ -292,7 +391,11 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isSidebarOpen }
                     <Link
                       to={`/${role || 'student'}/profile`}
                       onClick={() => setShowUserMenu(false)}
-                      className="flex items-center gap-2 px-3 py-2 text-xs text-slate-300 hover:text-white hover:bg-slate-800 rounded-lg transition-colors"
+                      className={`flex items-center gap-2 px-3 py-2 text-xs rounded-lg transition-colors ${
+                        isEmeraldMint
+                          ? 'text-slate-200 hover:text-white hover:bg-emerald-950'
+                          : 'text-slate-200 hover:text-white hover:bg-slate-800'
+                      }`}
                     >
                       <UserIcon className="w-4 h-4 text-slate-400" />
                       <span>My Profile & Auth</span>
@@ -300,7 +403,7 @@ export const Navbar: React.FC<NavbarProps> = ({ onToggleSidebar, isSidebarOpen }
 
                     <button
                       onClick={handleLogout}
-                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/10 rounded-lg transition-colors text-left"
+                      className="w-full flex items-center gap-2 px-3 py-2 text-xs text-rose-400 hover:bg-rose-500/20 rounded-lg transition-colors text-left font-medium"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Sign Out</span>

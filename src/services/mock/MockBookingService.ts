@@ -208,10 +208,14 @@ export class MockBookingService implements IBookingService {
       actorId: user.id,
       actorName: user.name || user.email || 'Student User',
       actorRole: user.role || 'student',
+      actorEmail: user.email,
       correlationId: `corr-${newBooking.bookingId}`,
       before: null,
       after: {
         bookingId: newBooking.bookingId,
+        email: user.email,
+        userEmail: user.email,
+        actorEmail: user.email,
         labId: data.labId,
         date: data.date,
         timeSlot: `${data.startTime} - ${data.endTime}`,
@@ -262,17 +266,25 @@ export class MockBookingService implements IBookingService {
     all[index].updatedAt = new Date().toISOString();
     saveBookings(all);
 
+    const currentUserJson = localStorage.getItem('smart_campus_auth_user');
+    const currentUser = currentUserJson ? JSON.parse(currentUserJson) : null;
+    const userEmail = currentUser?.email || (typeof all[index].user === 'object' ? (all[index].user as any)?.email : '');
+
     // Stream cancellation to Supabase audit_log
     recordAuditLog({
       action: 'LAB_RESERVATION_CANCELLED',
       actorId: all[index].user as any,
+      actorEmail: userEmail,
       correlationId: `corr-cancel-${all[index].bookingId}`,
-      before: { status: prevStatus, bookingId: all[index].bookingId },
+      before: { status: prevStatus, bookingId: all[index].bookingId, email: userEmail },
       after: {
         status: 'CANCELLED',
         cancellationReason: all[index].cancellationReason,
         bookingId: all[index].bookingId,
         labId: all[index].lab,
+        email: userEmail,
+        userEmail: userEmail,
+        actorEmail: userEmail,
       },
     }).catch((e) => console.warn('[Supabase Realtime] Cancel audit notice:', e));
 

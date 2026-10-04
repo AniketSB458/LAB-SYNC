@@ -18,6 +18,7 @@ import {
   Database,
   Send,
   AlertTriangle,
+  Mail,
 } from 'lucide-react';
 import { useSupabaseAuditLog, useTheme } from '../../hooks';
 import { Button } from '../common';
@@ -27,6 +28,9 @@ interface AuditPayloadData {
   labId?: string;
   labName?: string;
   userName?: string;
+  email?: string;
+  userEmail?: string;
+  actorEmail?: string;
   date?: string;
   timeSlot?: string;
   purpose?: string;
@@ -37,6 +41,8 @@ interface AuditPayloadData {
     actorId?: string;
     actorName?: string;
     actorRole?: string;
+    actorEmail?: string;
+    email?: string;
   };
   [key: string]: unknown;
 }
@@ -84,10 +90,14 @@ export const SupabaseRealtimeAuditConsole: React.FC = () => {
       actorId: null,
       actorName: 'Student User (Live Realtime)',
       actorRole: 'student',
+      actorEmail: 'anyabandgar458@gmail.com',
       correlationId: `corr-${bookingId}`,
       before: null,
       after: {
         bookingId,
+        email: 'anyabandgar458@gmail.com',
+        userEmail: 'anyabandgar458@gmail.com',
+        actorEmail: 'anyabandgar458@gmail.com',
         labId: pickedLab.id,
         labName: pickedLab.name,
         date: new Date().toISOString().split('T')[0],
@@ -296,6 +306,16 @@ export const SupabaseRealtimeAuditConsole: React.FC = () => {
               (entry.actor_id ? `User #${entry.actor_id.slice(0, 8)}` : 'Campus User')
             );
             const actorRole = String(recordedBy.actorRole || 'student');
+            const actorEmail = String(
+              afterData.email ||
+              afterData.userEmail ||
+              afterData.actorEmail ||
+              recordedBy.email ||
+              recordedBy.actorEmail ||
+              (entry.before as any)?.email ||
+              (entry.before as any)?.userEmail ||
+              ''
+            );
             const labName = String(
               afterData.labName || afterData.labId || 'General Facility'
             );
@@ -347,14 +367,27 @@ export const SupabaseRealtimeAuditConsole: React.FC = () => {
                 </div>
 
                 {/* Summary Info */}
-                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-300 text-xs">
+                <div className="flex flex-wrap items-center gap-x-3.5 gap-y-1.5 text-slate-300 text-xs">
                   <span className="flex items-center gap-1">
-                    <User className="w-3 h-3 text-slate-400" />
+                    <User className="w-3.5 h-3.5 text-slate-400 shrink-0" />
                     <strong className="text-white">{actorName}</strong>
                     <span className="text-slate-500">
                       ({actorRole})
                     </span>
                   </span>
+
+                  {/* Prominent User Activity Email Display */}
+                  {actorEmail ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-sky-500/15 border border-sky-500/30 text-sky-300 font-mono text-[11px] font-medium">
+                      <Mail className="w-3 h-3 text-sky-400 shrink-0" />
+                      <span>{actorEmail}</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-slate-500 bg-slate-800/40">
+                      <Mail className="w-2.5 h-2.5 text-slate-500" />
+                      <span>system</span>
+                    </span>
+                  )}
 
                   {bookingId && (
                     <span className="font-mono text-indigo-300 font-bold">

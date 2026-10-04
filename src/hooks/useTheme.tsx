@@ -11,7 +11,7 @@ interface ThemeContextType {
   isEmeraldMint: boolean;
 }
 
-const THEME_STORAGE_KEY = 'smart_campus_theme_v2';
+const THEME_STORAGE_KEY = 'smart_campus_theme_v3';
 
 const defaultThemeContext: ThemeContextType = {
   theme: 'gold-pink',
@@ -27,15 +27,15 @@ const ThemeContext = createContext<ThemeContextType>(defaultThemeContext);
 export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme, setThemeState] = useState<AppTheme>(() => {
     try {
-      const saved = localStorage.getItem(THEME_STORAGE_KEY);
-      if (saved === 'gold-pink' || saved === 'instagram') {
-        return 'gold-pink';
-      }
+      const saved = localStorage.getItem(THEME_STORAGE_KEY) || localStorage.getItem('smart_campus_theme_v2');
       if (saved === 'emerald-mint') {
         return 'emerald-mint';
       }
       if (saved === 'default') {
         return 'default';
+      }
+      if (saved === 'gold-pink' || saved === 'instagram') {
+        return 'gold-pink';
       }
     } catch {
       // LocalStorage access fallback

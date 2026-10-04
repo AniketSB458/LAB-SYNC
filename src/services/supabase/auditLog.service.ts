@@ -15,6 +15,7 @@ export interface RecordAuditParams {
   actorId?: string | null;
   actorName?: string;
   actorRole?: string;
+  actorEmail?: string;
   correlationId?: string;
   before?: Record<string, unknown> | null;
   after?: Record<string, unknown> | null;
@@ -55,16 +56,72 @@ export async function recordAuditLog(params: RecordAuditParams): Promise<Supabas
       validActorId = params.actorId;
     }
 
-    // Ensure actor metadata is captured inside 'after' payload if actor_id is not a UUID
+    // Resolve actor email from params, after payload, or active session
+    let resolvedEmail =
+      params.actorEmail ||
+      (params.after as any)?.email ||
+      (params.after as any)?.userEmail ||
+      (params.after as any)?.actorEmail ||
+      '';
+    let resolvedName =
+      params.actorName ||
+      (params.after as any)?.userName ||
+      (params.after as any)?.actorName ||
+      '';
+    let resolvedRole =
+      params.actorRole ||
+      (params.after as any)?.role ||
+      (params.after as any)?.actorRole ||
+      '';
+
+    if (!resolvedEmail && typeof window !== 'undefined') {
+      try {
+        const storedUserStr = localStorage.getItem('smart_campus_auth_user');
+        if (storedUserStr) {
+          const u = JSON.parse(storedUserStr);
+          if (u.email) resolvedEmail = u.email;
+          if (!resolvedName && u.name) resolvedName = u.name;
+          if (!resolvedRole && u.role) resolvedRole = u.role;
+        }
+      } catch {
+        // ignore
+      }
+    }
+
+    // Ensure actor metadata & email are captured inside 'after' payload
     const enrichedAfter = {
       ...(params.after || {}),
+      email: resolvedEmail,
+      userEmail: resolvedEmail,
+      actorEmail: resolvedEmail,
+      userName: resolvedName || 'Campus User',
+      actorRole: resolvedRole || 'student',
       _recordedBy: {
-        actorId: params.actorId || 'system',
-        actorName: params.actorName || 'Student/Faculty User',
-        actorRole: params.actorRole || 'student',
+        actorId: params.actorId || validActorId || 'system',
+        actorName: resolvedName || 'Campus User',
+        actorRole: resolvedRole || 'student',
+        actorEmail: resolvedEmail,
+        email: resolvedEmail,
       },
       _systemTime: new Date().toISOString(),
     };
+
+    // If validActorId & email exist, ensure user profile row is present in Supabase profiles
+    if (validActorId && resolvedEmail) {
+      try {
+        await supabase.from('profiles').upsert(
+          {
+            id: validActorId,
+            email: resolvedEmail,
+            full_name: resolvedName || 'Campus User',
+            role: resolvedRole || 'student',
+          },
+          { onConflict: 'id' }
+        );
+      } catch {
+        // continue
+      }
+    }
 
     const rowToInsert = {
       action: params.action,
@@ -75,13 +132,24 @@ export async function recordAuditLog(params: RecordAuditParams): Promise<Supabas
     };
 
     // 1. Insert into Supabase 'audit_log' table
-    const { data, error } = await supabase
+    let { data, error } = await supabase
       .from('audit_log')
       .insert([rowToInsert])
       .select();
 
     if (error) {
       console.warn('[Supabase Audit Log] Insert warning:', error.message);
+      // If foreign key constraint failed on actor_id, retry with actor_id: null
+      if (error.code === '23503' || error.message?.includes('foreign key')) {
+        const retryRes = await supabase
+          .from('audit_log')
+          .insert([{ ...rowToInsert, actor_id: null }])
+          .select();
+        if (retryRes.data) {
+          data = retryRes.data;
+          error = null;
+        }
+      }
     }
 
     const insertedEntry: SupabaseAuditLogEntry =

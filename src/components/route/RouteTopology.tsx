@@ -15,7 +15,7 @@ import {
   Award,
 } from 'lucide-react';
 import { NesPandaSprite } from './NesPandaSprite';
-import { useDeviceLocation, useTheme } from '../../hooks';
+import { useDeviceLocation, useTheme, useAuth } from '../../hooks';
 import { recordAuditLog } from '../../services/supabase/auditLog.service';
 
 export interface RouteTopologyProps {
@@ -40,6 +40,7 @@ export const RouteTopology: React.FC<RouteTopologyProps> = ({
   className = '',
 }) => {
   const { isGoldPink, isEmeraldMint } = useTheme();
+  const { user } = useAuth();
 
   // Support both controlled and uncontrolled step navigation
   const [internalStepIndex, setInternalStepIndex] = useState(0);
@@ -95,6 +96,25 @@ export const RouteTopology: React.FC<RouteTopologyProps> = ({
       if (stepIndex === activePath.length - 1 && activePath.length > 1) {
         setShowCelebration(true);
         const celebTimer = setTimeout(() => setShowCelebration(false), 4500);
+
+        const destNode = nodeMap.current.get(activePath[stepIndex])?.name || activePath[stepIndex];
+        recordAuditLog({
+          action: 'CAMPUS_WAYFINDING_DESTINATION_REACHED',
+          actorId: user?.id,
+          actorName: user?.name,
+          actorRole: user?.role,
+          actorEmail: user?.email,
+          correlationId: `corr-dest-${Date.now()}`,
+          after: {
+            destination: destNode,
+            totalSteps: activePath.length,
+            email: user?.email,
+            userEmail: user?.email,
+            actorEmail: user?.email,
+            timestamp: new Date().toISOString(),
+          },
+        }).catch((e) => console.warn('Supabase destination audit notice:', e));
+
         return () => {
           clearTimeout(timer);
           clearTimeout(celebTimer);
@@ -103,7 +123,7 @@ export const RouteTopology: React.FC<RouteTopologyProps> = ({
 
       return () => clearTimeout(timer);
     }
-  }, [stepIndex, activePath]);
+  }, [stepIndex, activePath, user]);
 
   // Handle advancing to next step
   const handleNextStep = () => {
@@ -114,11 +134,18 @@ export const RouteTopology: React.FC<RouteTopologyProps> = ({
       // Stream step completion to Supabase Realtime
       recordAuditLog({
         action: 'CAMPUS_WAYFINDING_STEP_COMPLETED',
+        actorId: user?.id,
+        actorName: user?.name,
+        actorRole: user?.role,
+        actorEmail: user?.email,
         correlationId: `corr-waypoint-${nextIdx}-${Date.now()}`,
         after: {
           stepIndex: nextIdx + 1,
           totalSteps: activePath.length,
           arrivedAtWaypoint: nextNodeName,
+          email: user?.email,
+          userEmail: user?.email,
+          actorEmail: user?.email,
           timestamp: new Date().toISOString(),
         },
       }).catch((e) => console.warn('Supabase audit notice:', e));

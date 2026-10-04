@@ -165,12 +165,12 @@ export const ProfilePage: React.FC = () => {
 
       {/* Profile Overview Card */}
       <div
-        className={`p-6 sm:p-8 rounded-2xl border transition-colors shadow-2xl backdrop-blur-xl space-y-6 ${
+        className={`p-6 sm:p-8 rounded-2xl border transition-colors shadow-2xl space-y-6 ${
           isGoldPink
-            ? 'bg-white/98 border-pink-200/90 shadow-pink-900/5 text-slate-800 ring-1 ring-pink-100/80'
+            ? 'bg-white border-pink-200/90 shadow-pink-900/5 text-slate-800 ring-1 ring-pink-100/80'
             : isEmeraldMint
-            ? 'bg-slate-900/98 border-emerald-500/30 shadow-emerald-950/40 text-slate-100'
-            : 'bg-slate-900/98 border-slate-800/90 shadow-slate-950/60 text-slate-100'
+            ? 'bg-slate-950 border-emerald-500/40 shadow-emerald-950/80 text-slate-100'
+            : 'bg-slate-950 border-indigo-500/40 shadow-slate-950/90 text-slate-100'
         }`}
       >
         <div
@@ -299,7 +299,15 @@ export const ProfilePage: React.FC = () => {
       </div>
 
       {/* Security & Password Change Card */}
-      <div className="glass-panel p-6 sm:p-8 rounded-2xl border border-slate-800 space-y-4 shadow-xl">
+      <div
+        className={`p-6 sm:p-8 rounded-2xl border space-y-4 shadow-xl transition-colors ${
+          isGoldPink
+            ? 'bg-white border-pink-200/90 shadow-pink-900/5 text-slate-800 ring-1 ring-pink-100/80'
+            : isEmeraldMint
+            ? 'bg-slate-950 border-emerald-500/40 shadow-emerald-950/80 text-slate-100'
+            : 'bg-slate-950 border-indigo-500/40 shadow-slate-950/90 text-slate-100'
+        }`}
+      >
         <div className="flex items-center gap-2 pb-3 border-b border-slate-800">
           <KeyRound className="w-4 h-4 text-indigo-400" />
           <div>

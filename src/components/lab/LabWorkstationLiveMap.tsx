@@ -199,6 +199,7 @@ export const LabWorkstationLiveMap: React.FC<LabWorkstationLiveMapProps> = ({
         actorId: userUuid,
         actorName: user?.name || user?.email || 'Student User',
         actorRole: user?.role || 'student',
+        actorEmail: user?.email,
         correlationId: `corr-bench-${pc.label}-${Date.now()}`,
         before: { resourceId: pc.id, previousState: pc.state },
         after: {
@@ -207,6 +208,9 @@ export const LabWorkstationLiveMap: React.FC<LabWorkstationLiveMapProps> = ({
           labId: pc.labId,
           newState: 'ALLOCATED',
           allocatedTo: user?.name || user?.email,
+          email: user?.email,
+          userEmail: user?.email,
+          actorEmail: user?.email,
           timestamp: new Date().toISOString(),
         },
       }).catch((e) => console.warn('[Supabase Realtime] Workstation audit notice:', e));
