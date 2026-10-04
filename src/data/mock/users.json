@@ -24,7 +24,7 @@
   {
     "id": "10000000-0000-0000-0000-000000000003",
     "name": "Prof. Rajesh Patil",
-    "email": "faculty@ritindia.edu",
+    "email": "faculty.name@ritindia.edu",
     "role": "faculty",
     "department": "Computer Science & Engineering",
     "profile": {
@@ -33,13 +33,35 @@
     "createdAt": "2025-08-20T08:00:00.000Z"
   },
   {
+    "id": "10000000-0000-0000-0000-000000000004",
+    "name": "Prof. R. S. Patil",
+    "email": "faculty@ritindia.edu",
+    "role": "faculty",
+    "department": "Computer Science & Engineering",
+    "profile": {
+      "phone": "+91 98220 12346"
+    },
+    "createdAt": "2025-08-20T08:00:00.000Z"
+  },
+  {
     "id": "10000000-0000-0000-0000-000000000005",
     "name": "Dr. Vikramaditya Admin",
-    "email": "admin@ritindia.edu",
+    "email": "admin.office@ritindia.edu",
     "role": "admin",
     "department": "Campus Resource Administration",
     "profile": {
       "phone": "+91 94220 98765"
+    },
+    "createdAt": "2025-01-10T08:00:00.000Z"
+  },
+  {
+    "id": "10000000-0000-0000-0000-000000000006",
+    "name": "Central Campus Admin",
+    "email": "admin@ritindia.edu",
+    "role": "admin",
+    "department": "Campus Resource Administration",
+    "profile": {
+      "phone": "+91 94220 98766"
     },
     "createdAt": "2025-01-10T08:00:00.000Z"
   }

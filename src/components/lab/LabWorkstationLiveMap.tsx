@@ -127,7 +127,7 @@ export const LabWorkstationLiveMap: React.FC<LabWorkstationLiveMapProps> = ({
               ? {
                   userId: `usr-${i}`,
                   fullName: i === 3 ? (user?.name || 'Anya Bandgar') : 'Dr. P. R. Kulkarni',
-                  email: i === 3 ? (user?.email || 'anyabandgar458@gmail.com') : 'pr.kulkarni@ritindia.edu',
+                  email: i === 3 ? (user?.email || '2553018@ritindia.edu') : 'pr.kulkarni@ritindia.edu',
                   role: i === 3 ? (role || 'student') : 'faculty',
                   purpose: i === 3 ? 'Practical Session' : 'Curriculum Lab Evaluation',
                   startAt: new Date(Date.now() - 25 * 60000).toISOString(),

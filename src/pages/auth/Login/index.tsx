@@ -12,8 +12,8 @@ export const LoginPage: React.FC = () => {
   const location = useLocation();
 
   const [selectedRole, setSelectedRole] = useState<Role>('student');
-  const [emailOrUsername, setEmailOrUsername] = useState('anyabandgar458@gmail.com');
-  const [password, setPassword] = useState('password123');
+  const [emailOrUsername, setEmailOrUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -38,6 +38,32 @@ export const LoginPage: React.FC = () => {
     }
   }, [isAuthenticated, role, isSessionExpired, from, navigate]);
 
+  // Handle Role selection without overwriting user's input
+  const handleRoleSelect = (newRole: Role) => {
+    setSelectedRole(newRole);
+    setError(null);
+  };
+
+  // Handle typing with smart auto-role synchronization
+  const handleEmailChange = (val: string) => {
+    setEmailOrUsername(val);
+    setError(null);
+    const clean = val.trim().toLowerCase();
+    if (!clean) return;
+
+    const prefix = clean.includes('@') ? clean.split('@')[0] : clean;
+
+    if (prefix.startsWith('admin')) {
+      setSelectedRole('admin');
+    } else if (/^\d+$/.test(prefix)) {
+      // 7-digit PRN numbers -> student
+      setSelectedRole('student');
+    } else if (clean.includes('@ritindia.edu') || clean.includes('@') || prefix.length >= 3) {
+      // Non-numeric email like asb@ritindia.edu -> strictly Faculty
+      setSelectedRole('faculty');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     let trimmedInput = emailOrUsername.trim().toLowerCase();
@@ -47,19 +73,43 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
-    // Auto-append @ritindia.edu if user only typed their 7-digit PRN
+    // Auto-append @ritindia.edu if user entered only their 7-digit PRN
     if (!trimmedInput.includes('@') && /^\d{7}$/.test(trimmedInput)) {
       trimmedInput = `${trimmedInput}@ritindia.edu`;
+      setEmailOrUsername(trimmedInput);
     }
 
-    if (!trimmedInput.includes('@') || !trimmedInput.includes('.')) {
-      setError('Please enter a valid email address (e.g. anyabandgar458@gmail.com or 2553018@ritindia.edu).');
+    // STRICT CHECK: ONLY institutional accounts ending with @ritindia.edu are authorized
+    if (!trimmedInput.endsWith('@ritindia.edu')) {
+      setError('Access Denied: Only official campus accounts ending with @ritindia.edu are authorized to sign in.');
       return;
     }
 
     if (password.length < 6) {
       setError('Password must be at least 6 characters.');
       return;
+    }
+
+    // Determine the user's TRUE role strictly as per the email provided:
+    // - Student: strictly 7-digit PRN @ritindia.edu (e.g. 2553018@ritindia.edu)
+    // - Admin: starts with admin (e.g. admin.office@ritindia.edu)
+    // - Faculty: any name / initials email (e.g. asb@ritindia.edu, faculty.patil@ritindia.edu)
+    const usernamePart = trimmedInput.split('@')[0];
+    const isStudentEmail = /^\d{7}$/.test(usernamePart);
+    const isAdminEmail = /^admin(\.[a-z0-9._-]+)?$/.test(usernamePart);
+
+    let effectiveRole: Role = 'faculty';
+    if (isStudentEmail) {
+      effectiveRole = 'student';
+    } else if (isAdminEmail) {
+      effectiveRole = 'admin';
+    } else {
+      effectiveRole = 'faculty';
+    }
+
+    // If student tab was selected but user entered asb@ritindia.edu, switch tab to faculty immediately!
+    if (selectedRole !== effectiveRole) {
+      setSelectedRole(effectiveRole);
     }
 
     setError(null);
@@ -69,9 +119,9 @@ export const LoginPage: React.FC = () => {
       const authenticatedUser = await login({
         email: trimmedInput,
         password,
-        role: selectedRole,
+        role: effectiveRole,
       });
-      const targetRole = authenticatedUser?.role || selectedRole;
+      const targetRole = authenticatedUser?.role || effectiveRole;
 
       if (from && !from.includes('/login') && !from.includes('/unauthorized')) {
         navigate(from, { replace: true });
@@ -128,11 +178,23 @@ export const LoginPage: React.FC = () => {
         {/* 1. Email Input */}
         <div>
           <Input
-            label="Email Address / Campus PRN"
-            type="email"
-            placeholder="anyabandgar458@gmail.com or PRN@ritindia.edu"
+            label={
+              selectedRole === 'faculty'
+                ? 'Faculty Email Address'
+                : selectedRole === 'admin'
+                ? 'Administrator Email Address'
+                : 'Student Email / Campus PRN'
+            }
+            type="text"
+            placeholder={
+              selectedRole === 'faculty'
+                ? 'faculty.name@ritindia.edu'
+                : selectedRole === 'admin'
+                ? 'admin.office@ritindia.edu'
+                : 'eg., 7-digit PRN @ritindia.edu'
+            }
             value={emailOrUsername}
-            onChange={(e) => setEmailOrUsername(e.target.value)}
+            onChange={(e) => handleEmailChange(e.target.value)}
             leftIcon={<Mail className="w-4 h-4" />}
             autoComplete="email"
             required
@@ -202,10 +264,7 @@ export const LoginPage: React.FC = () => {
                 <button
                   key={r.id}
                   type="button"
-                  onClick={() => {
-                    setSelectedRole(r.id);
-                    setError(null);
-                  }}
+                  onClick={() => handleRoleSelect(r.id)}
                   className={`flex items-center justify-center gap-1.5 py-1.5 px-2 rounded-lg text-xs font-semibold transition-all duration-150 ${
                     isSelected
                       ? isGoldPink

@@ -4,19 +4,39 @@ import { usersData } from '../../data/mock';
 import { getUserUuid } from '../../utils';
 import { recordAuditLog } from '../supabase/auditLog.service';
 
-const USERS_KEY = 'smart_campus_rit_users_v3';
+const USERS_KEY = 'smart_campus_rit_users_v6';
 const CURRENT_USER_KEY = 'smart_campus_auth_user';
 
 function getStoredUsers(): User[] {
-  const defaultAnyaUser: User = {
-    id: '10000000-0000-0000-0000-000002553018',
-    name: 'Anya Bandgar',
-    email: 'anyabandgar458@gmail.com',
-    role: 'student',
-    department: 'Computer Science & Engineering',
-    profile: { phone: '+91 98765 43210' },
-    createdAt: '2026-10-01T00:00:00.000Z',
-  };
+  const defaultStandardUsers: User[] = [
+    {
+      id: '10000000-0000-0000-0000-000000000001',
+      name: 'Anya Bandgar',
+      email: '2553018@ritindia.edu',
+      role: 'student',
+      department: 'Computer Science & Engineering',
+      profile: { phone: '+91 98765 43210' },
+      createdAt: '2026-01-15T08:00:00.000Z',
+    },
+    {
+      id: '10000000-0000-0000-0000-000000000003',
+      name: 'Prof. Rajesh Patil',
+      email: 'faculty.name@ritindia.edu',
+      role: 'faculty',
+      department: 'Computer Science & Engineering',
+      profile: { phone: '+91 98220 12345' },
+      createdAt: '2025-08-20T08:00:00.000Z',
+    },
+    {
+      id: '10000000-0000-0000-0000-000000000005',
+      name: 'Dr. Vikramaditya Admin',
+      email: 'admin.office@ritindia.edu',
+      role: 'admin',
+      department: 'Campus Resource Administration',
+      profile: { phone: '+91 94220 98765' },
+      createdAt: '2025-01-10T08:00:00.000Z',
+    },
+  ];
 
   const stored = localStorage.getItem(USERS_KEY);
   if (stored) {
@@ -32,16 +52,25 @@ function getStoredUsers(): User[] {
           }
           if (/^\d{7}@ritindia\.edu$/i.test(u.email) && u.role !== 'student') {
             u.role = 'student';
-            if (u.email === '2553018@ritindia.edu') {
-              u.name = 'Anya Bandgar';
-            }
+            modified = true;
+          }
+          if (/^faculty(\.[a-z0-9._-]+)?@ritindia\.edu$/i.test(u.email) && u.role !== 'faculty') {
+            u.role = 'faculty';
+            modified = true;
+          }
+          if (/^admin(\.[a-z0-9._-]+)?@ritindia\.edu$/i.test(u.email) && u.role !== 'admin') {
+            u.role = 'admin';
             modified = true;
           }
         });
-        if (!parsed.some((u: User) => u.email?.toLowerCase() === 'anyabandgar458@gmail.com')) {
-          parsed.push(defaultAnyaUser);
-          modified = true;
-        }
+
+        defaultStandardUsers.forEach((def) => {
+          if (!parsed.some((u: User) => u.email?.toLowerCase() === def.email.toLowerCase())) {
+            parsed.push(def);
+            modified = true;
+          }
+        });
+
         if (modified) {
           localStorage.setItem(USERS_KEY, JSON.stringify(parsed));
         }
@@ -51,15 +80,20 @@ function getStoredUsers(): User[] {
       // fallback
     }
   }
-  const initialized = (usersData as any[]).map((u) => ({
+
+  const initialized: User[] = (usersData as any[]).map((u) => ({
     ...u,
     id: getUserUuid(u),
   }));
-  if (!initialized.some((u: any) => u.email?.toLowerCase() === 'anyabandgar458@gmail.com')) {
-    initialized.push(defaultAnyaUser);
-  }
+
+  defaultStandardUsers.forEach((def) => {
+    if (!initialized.some((u) => u.email?.toLowerCase() === def.email.toLowerCase())) {
+      initialized.push(def);
+    }
+  });
+
   localStorage.setItem(USERS_KEY, JSON.stringify(initialized));
-  return initialized as User[];
+  return initialized;
 }
 
 export class MockAuthService implements IAuthService {
@@ -79,19 +113,33 @@ export class MockAuthService implements IAuthService {
       };
     }
 
-    const isStudentEmail = /^\d{7}@ritindia\.edu$/i.test(trimmedEmail);
+    if (!trimmedEmail.endsWith('@ritindia.edu')) {
+      throw {
+        response: {
+          data: {
+            success: false,
+            message: 'Unauthorized domain. Only official campus accounts ending with @ritindia.edu are authorized.',
+          },
+        },
+      };
+    }
+
+    const usernamePart = trimmedEmail.split('@')[0];
+    const isStudentEmail = /^\d{7}$/.test(usernamePart);
+    const isAdminEmail = /^admin(\.[a-z0-9._-]+)?$/.test(usernamePart);
+
+    const targetRole: Role = isStudentEmail
+      ? 'student'
+      : isAdminEmail
+      ? 'admin'
+      : 'faculty';
+
     const users = getStoredUsers();
     let user = users.find((u) => u.email.toLowerCase() === trimmedEmail);
 
-    const targetRole: Role = user?.role || (isStudentEmail ? 'student' : credentials.role || 'student');
-
     if (user) {
-      // Self-heal student integrity if corrupted
-      if (isStudentEmail && user.role !== 'student') {
-        user.role = 'student';
-        if (user.email === '2553018@ritindia.edu' || user.email === 'anyabandgar458@gmail.com') {
-          user.name = 'Anya Bandgar';
-        }
+      if (user.role !== targetRole) {
+        user.role = targetRole;
         const idx = users.findIndex((u) => u.email.toLowerCase() === trimmedEmail);
         if (idx !== -1) {
           users[idx] = user;
@@ -99,13 +147,13 @@ export class MockAuthService implements IAuthService {
         }
       }
     } else {
-      // Dynamically provision for account
-      const prefix = trimmedEmail.split('@')[0];
+      // Dynamically provision account
+      const prefix = usernamePart;
       const isNumeric = /^\d+$/.test(prefix);
-      const capitalizedName = trimmedEmail.includes('anyabandgar')
-        ? 'Anya Bandgar'
-        : isNumeric
+      const capitalizedName = isNumeric
         ? `Student (${prefix})`
+        : prefix === 'asb'
+        ? 'Prof. A. S. Bandgar'
         : prefix
             .split(/[._-]/)
             .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
@@ -116,7 +164,7 @@ export class MockAuthService implements IAuthService {
         name: capitalizedName || 'Campus User',
         email: trimmedEmail,
         role: targetRole,
-        department: 'Computer Science & Engineering',
+        department: targetRole === 'admin' ? 'Campus Resource Administration' : 'Computer Science & Engineering',
         profile: {
           phone: '+91 98765 43210',
         },
@@ -159,12 +207,12 @@ export class MockAuthService implements IAuthService {
     await new Promise((r) => setTimeout(r, 250));
 
     const trimmedEmail = data.email.trim().toLowerCase();
-    if (!trimmedEmail || !trimmedEmail.includes('@') || !trimmedEmail.includes('.')) {
+    if (!trimmedEmail || !trimmedEmail.includes('@') || !trimmedEmail.endsWith('@ritindia.edu')) {
       throw {
         response: {
           data: {
             success: false,
-            message: 'Please enter a valid email address (e.g. anyabandgar458@gmail.com or 2553018@ritindia.edu).',
+            message: 'Registration is restricted to official campus accounts ending with @ritindia.edu.',
           },
         },
       };
