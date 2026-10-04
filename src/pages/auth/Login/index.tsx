@@ -125,7 +125,47 @@ export const LoginPage: React.FC = () => {
       )}
 
       <form onSubmit={handleSubmit} className="space-y-3.5">
-        {/* Role Selector */}
+        {/* 1. Email Input */}
+        <div>
+          <Input
+            label="Email Address / Campus PRN"
+            type="email"
+            placeholder="anyabandgar458@gmail.com or PRN@ritindia.edu"
+            value={emailOrUsername}
+            onChange={(e) => setEmailOrUsername(e.target.value)}
+            leftIcon={<Mail className="w-4 h-4" />}
+            autoComplete="email"
+            required
+          />
+        </div>
+
+        {/* 2. Password Input */}
+        <Input
+          label="Password"
+          type={showPassword ? 'text' : 'password'}
+          placeholder="••••••••"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          leftIcon={<Lock className="w-4 h-4" />}
+          rightIcon={
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className={`transition-colors focus:outline-none ${
+                isGoldPink
+                  ? 'text-slate-400 hover:text-slate-700'
+                  : 'text-slate-400 hover:text-slate-200'
+              }`}
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+            </button>
+          }
+          autoComplete="current-password"
+          required
+        />
+
+        {/* 3. Role Selector (After Password) */}
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label
@@ -186,47 +226,7 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Email Input */}
-        <div>
-          <Input
-            label="Email Address / Campus PRN"
-            type="email"
-            placeholder="anyabandgar458@gmail.com or PRN@ritindia.edu"
-            value={emailOrUsername}
-            onChange={(e) => setEmailOrUsername(e.target.value)}
-            leftIcon={<Mail className="w-4 h-4" />}
-            autoComplete="email"
-            required
-          />
-        </div>
-
-        {/* Password Input */}
-        <Input
-          label="Password"
-          type={showPassword ? 'text' : 'password'}
-          placeholder="••••••••"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          leftIcon={<Lock className="w-4 h-4" />}
-          rightIcon={
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className={`transition-colors focus:outline-none ${
-                isGoldPink
-                  ? 'text-slate-400 hover:text-slate-700'
-                  : 'text-slate-400 hover:text-slate-200'
-              }`}
-              aria-label={showPassword ? 'Hide password' : 'Show password'}
-            >
-              {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-            </button>
-          }
-          autoComplete="current-password"
-          required
-        />
-
-        {/* Submit Button */}
+        {/* 4. Submit Button */}
         <Button
           type="submit"
           className={`w-full mt-2 transition-all ${
