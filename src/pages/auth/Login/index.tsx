@@ -1,22 +1,19 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, LogIn, AlertTriangle, GraduationCap, BookOpen, Shield, UserPlus, User } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, LogIn, AlertTriangle, GraduationCap, BookOpen, Shield } from 'lucide-react';
 import { Button, Input, ErrorMessage } from '../../../components/common';
 import { useAuth, useTheme } from '../../../hooks';
 import { Role } from '../../../types';
 
 export const LoginPage: React.FC = () => {
-  const { login, register, isAuthenticated, role } = useAuth();
+  const { login, isAuthenticated, role } = useAuth();
   const { isGoldPink, isEmeraldMint } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
   const [selectedRole, setSelectedRole] = useState<Role>('student');
-  const [fullName, setFullName] = useState('Anya Bandgar');
   const [emailOrUsername, setEmailOrUsername] = useState('anyabandgar458@gmail.com');
   const [password, setPassword] = useState('password123');
-  const [confirmPassword, setConfirmPassword] = useState('password123');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -65,37 +62,15 @@ export const LoginPage: React.FC = () => {
       return;
     }
 
-    if (authMode === 'register') {
-      if (!fullName.trim()) {
-        setError('Please enter your full name.');
-        return;
-      }
-      if (password !== confirmPassword) {
-        setError('Passwords do not match. Please re-enter.');
-        return;
-      }
-    }
-
     setError(null);
     setIsLoading(true);
 
     try {
-      let authenticatedUser;
-      if (authMode === 'register') {
-        authenticatedUser = await register({
-          name: fullName.trim(),
-          email: trimmedInput,
-          password,
-          role: selectedRole,
-          department: 'Computer Science & Engineering',
-        });
-      } else {
-        authenticatedUser = await login({
-          email: trimmedInput,
-          password,
-          role: selectedRole,
-        });
-      }
+      const authenticatedUser = await login({
+        email: trimmedInput,
+        password,
+        role: selectedRole,
+      });
       const targetRole = authenticatedUser?.role || selectedRole;
 
       if (from && !from.includes('/login') && !from.includes('/unauthorized')) {
@@ -123,67 +98,15 @@ export const LoginPage: React.FC = () => {
             isGoldPink ? 'text-slate-900' : 'text-white'
           }`}
         >
-          {authMode === 'login' ? 'Sign In to Campus Portal' : 'Create Campus Account'}
+          Sign In to Campus Portal
         </h2>
         <p
           className={`text-xs mt-1 transition-colors ${
             isGoldPink ? 'text-slate-600' : 'text-slate-400'
           }`}
         >
-          {authMode === 'login'
-            ? 'Access laboratories, book resources, and track status'
-            : 'Register your email to reserve lab facilities and track audit logs'}
+          Access laboratories, book resources, and track status
         </p>
-      </div>
-
-      {/* Auth Mode Toggle Tabs (Sign In vs Create Account) */}
-      <div
-        className={`flex rounded-xl p-1 border transition-colors ${
-          isGoldPink
-            ? 'bg-rose-50/70 border-pink-200'
-            : isEmeraldMint
-            ? 'bg-slate-900 border-emerald-500/30'
-            : 'bg-slate-900 border-slate-800'
-        }`}
-      >
-        <button
-          type="button"
-          onClick={() => {
-            setAuthMode('login');
-            setError(null);
-          }}
-          className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-            authMode === 'login'
-              ? isGoldPink
-                ? 'bg-white text-pink-700 shadow-sm'
-                : isEmeraldMint
-                ? 'bg-emerald-950 text-emerald-200 border border-emerald-500/40 shadow-sm'
-                : 'bg-indigo-600 text-white shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <LogIn className="w-3.5 h-3.5" />
-          <span>Sign In</span>
-        </button>
-        <button
-          type="button"
-          onClick={() => {
-            setAuthMode('register');
-            setError(null);
-          }}
-          className={`flex-1 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 ${
-            authMode === 'register'
-              ? isGoldPink
-                ? 'bg-white text-pink-700 shadow-sm'
-                : isEmeraldMint
-                ? 'bg-emerald-950 text-emerald-200 border border-emerald-500/40 shadow-sm'
-                : 'bg-indigo-600 text-white shadow-sm'
-              : 'text-slate-400 hover:text-slate-200'
-          }`}
-        >
-          <UserPlus className="w-3.5 h-3.5" />
-          <span>Create Account</span>
-        </button>
       </div>
 
       {isSessionExpired && (
@@ -195,7 +118,7 @@ export const LoginPage: React.FC = () => {
 
       {error && (
         <ErrorMessage
-          title={authMode === 'login' ? 'Authentication Failed' : 'Registration Notice'}
+          title="Authentication Failed"
           message={error}
           onRetry={() => setError(null)}
         />
@@ -210,14 +133,14 @@ export const LoginPage: React.FC = () => {
                 isGoldPink ? 'text-slate-700' : 'text-slate-300'
               }`}
             >
-              {authMode === 'login' ? 'Sign In As Role' : 'Account Role'}
+              Sign In As Role
             </label>
             <span
               className={`text-[10px] font-medium capitalize ${
                 isGoldPink ? 'text-pink-600' : 'text-indigo-400'
               }`}
             >
-              Selected: {selectedRole}
+              Active: {selectedRole}
             </span>
           </div>
 
@@ -263,26 +186,10 @@ export const LoginPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Full Name Input for Registration */}
-        {authMode === 'register' && (
-          <div>
-            <Input
-              label="Full Name"
-              type="text"
-              placeholder="e.g. Anya Bandgar"
-              value={fullName}
-              onChange={(e) => setFullName(e.target.value)}
-              leftIcon={<User className="w-4 h-4" />}
-              autoComplete="name"
-              required
-            />
-          </div>
-        )}
-
         {/* Email Input */}
         <div>
           <Input
-            label={authMode === 'login' ? 'Email Address / Student PRN' : 'Email Address'}
+            label="Email Address / Campus PRN"
             type="email"
             placeholder="anyabandgar458@gmail.com or PRN@ritindia.edu"
             value={emailOrUsername}
@@ -315,23 +222,9 @@ export const LoginPage: React.FC = () => {
               {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
             </button>
           }
-          autoComplete={authMode === 'login' ? 'current-password' : 'new-password'}
+          autoComplete="current-password"
           required
         />
-
-        {/* Confirm Password for Register */}
-        {authMode === 'register' && (
-          <Input
-            label="Confirm Password"
-            type={showPassword ? 'text' : 'password'}
-            placeholder="••••••••"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            leftIcon={<Lock className="w-4 h-4" />}
-            autoComplete="new-password"
-            required
-          />
-        )}
 
         {/* Submit Button */}
         <Button
@@ -342,11 +235,9 @@ export const LoginPage: React.FC = () => {
               : ''
           }`}
           isLoading={isLoading}
-          leftIcon={authMode === 'login' ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+          leftIcon={<LogIn className="w-4 h-4" />}
         >
-          {authMode === 'login'
-            ? `Sign In as ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`
-            : `Create ${selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)} Account`}
+          Sign In as {selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}
         </Button>
       </form>
 
