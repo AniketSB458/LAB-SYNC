@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Mail, Lock, Eye, EyeOff, LogIn, AlertTriangle, GraduationCap, BookOpen, Shield } from 'lucide-react';
-import { Button, Input, ErrorMessage } from '../../../components/common';
+import { Mail, Lock, Eye, EyeOff, LogIn, AlertTriangle, GraduationCap, BookOpen, Shield, Sparkles } from 'lucide-react';
+import { Button, Input, ErrorMessage, CreatorProfileModal } from '../../../components/common';
 import { useAuth, useTheme } from '../../../hooks';
 import { Role } from '../../../types';
 
@@ -17,6 +17,7 @@ export const LoginPage: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [showCreatorProfile, setShowCreatorProfile] = useState(false);
 
   const from = (location.state as any)?.from?.pathname;
   const isSessionExpired =
@@ -308,14 +309,25 @@ export const LoginPage: React.FC = () => {
         <p className="text-[11px]">
           Smart Campus Resource Management System
         </p>
-        <p
-          className={`text-[10px] font-mono font-bold tracking-wider uppercase mt-1 ${
-            isGoldPink ? 'text-pink-600' : 'text-slate-400'
+        <button
+          type="button"
+          onClick={() => setShowCreatorProfile(true)}
+          className={`inline-flex items-center gap-1.5 text-[10px] font-mono font-bold tracking-wider uppercase mt-1 px-3 py-1 rounded-full transition-all duration-200 cursor-pointer shadow-sm hover:scale-105 active:scale-95 group ${
+            isGoldPink
+              ? 'bg-pink-50 hover:bg-pink-100/90 text-pink-600 border border-pink-200/80'
+              : 'bg-slate-800/70 hover:bg-slate-700/80 text-slate-300 border border-slate-700/80'
           }`}
+          title="Click to view creator profile (Aniket S. Bandgar)"
         >
-          MADE BY 458TM
-        </p>
+          <span>MADE BY 458™</span>
+          <Sparkles className="w-3 h-3 text-amber-500 transition-transform group-hover:rotate-12 animate-pulse" />
+        </button>
       </div>
+
+      <CreatorProfileModal
+        isOpen={showCreatorProfile}
+        onClose={() => setShowCreatorProfile(false)}
+      />
     </div>
   );
 };

@@ -16,7 +16,8 @@ import {
 } from 'lucide-react';
 import { useAuth, useTheme } from '../../hooks';
 import { Role } from '../../types';
-import { RITLogo } from '../common';
+import { RITLogo, CreatorProfileModal } from '../common';
+import { Sparkles } from 'lucide-react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -32,6 +33,7 @@ interface NavItem {
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
   const { role } = useAuth();
   const { isGoldPink } = useTheme();
+  const [showCreatorProfile, setShowCreatorProfile] = React.useState(false);
 
   const getNavItems = (currentRole: Role | null): NavItem[] => {
     switch (currentRole) {
@@ -131,23 +133,28 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose }) => {
 
         {/* Footer info badge */}
         <div className={`p-3 border-t ${isGoldPink ? 'border-pink-200/70' : 'border-slate-800/80'}`}>
-          <div
-            className={`py-2 px-3 rounded-xl border flex items-center justify-center text-center transition-colors ${
+          <button
+            type="button"
+            onClick={() => setShowCreatorProfile(true)}
+            className={`w-full py-2 px-3 rounded-xl border flex items-center justify-center gap-1.5 text-center transition-all cursor-pointer shadow-sm hover:scale-[1.02] active:scale-[0.98] ${
               isGoldPink
-                ? 'bg-pink-50/70 border-pink-200/90 shadow-sm'
-                : 'bg-slate-900/60 border-slate-800'
+                ? 'bg-pink-50/80 hover:bg-pink-100 border-pink-200/90 text-pink-700'
+                : 'bg-slate-900/60 hover:bg-slate-800 border-slate-800 text-slate-200'
             }`}
+            title="Click to view creator profile (Aniket S. Bandgar)"
           >
-            <span
-              className={`font-mono font-bold text-xs tracking-wider uppercase ${
-                isGoldPink ? 'text-pink-700' : 'text-slate-200'
-              }`}
-            >
-              Made BY 458TM
+            <span className="font-mono font-bold text-xs tracking-wider uppercase">
+              Made BY 458™
             </span>
-          </div>
+            <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+          </button>
         </div>
       </aside>
+
+      <CreatorProfileModal
+        isOpen={showCreatorProfile}
+        onClose={() => setShowCreatorProfile(false)}
+      />
     </>
   );
 };
